@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Betaflight - 专业飞控系统</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0A0E17;
+            color: #E5E7EB;
+            overflow-x: hidden;
+        }
+
+        /* 渐变背景动画 */
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-size: 200% 200%;
+            animation: gradientShift 15s ease infinite;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* 毛玻璃效果 */
+        .glass {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* 悬浮卡片效果 */
+        .hover-card {
+            transition: all 0.3s ease;
+        }
+
+        .hover-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(102, 126, 234, 0.3);
+        }
+
+        /* 发光按钮 */
+        .glow-btn {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .glow-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .glow-btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        /* 粒子背景 */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: rgba(102, 126, 234, 0.5);
+            border-radius: 50%;
+            animation: float 20s infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) translateX(0); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-100vh) translateX(100px); opacity: 0; }
+        }
+
+        /* 网格背景 */
+        .grid-bg {
+            background-image:
+                linear-gradient(rgba(102, 126, 234, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(102, 126, 234, 0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+        }
+    </style>
+</head>
+<body class="grid-bg">
+    <!-- 粒子背景 -->
+    <div class="particles" id="particles"></div>
+
+    <!-- 导航栏 -->
+    <nav class="fixed top-0 w-full z-50 glass border-b border-white/10">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-gradient-to-br from-purple-500 to-blue-500 rounded-lg flex items-center justify-center">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                    </svg>
+                </div>
+                <span class="text-xl font-bold text-white">Betaflight</span>
+            </div>
+            <div class="flex gap-8 items-center">
+                <a href="#" class="text-gray-300 hover:text-white transition">首页</a>
+                <a href="pages/products-modern.html" class="text-gray-300 hover:text-white transition">产品</a>
+                <a href="pages/downloads-modern.html" class="text-gray-300 hover:text-white transition">下载</a>
+                <a href="#" class="text-gray-300 hover:text-white transition">文档</a>
+                <button class="glow-btn bg-gradient-to-r from-purple-500 to-blue-500 text-white px-6 py-2.5 rounded-full font-medium hover:shadow-lg hover:shadow-purple-500/50 transition">
+                    启动配置器
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero 区域 -->
+    <section class="relative min-h-screen flex items-center justify-center pt-20 overflow-hidden">
+        <!-- 背景光效 -->
+        <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-500/30 rounded-full blur-3xl"></div>
+        <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-500/30 rounded-full blur-3xl"></div>
+
+        <div class="relative z-10 max-w-6xl mx-auto px-6 text-center">
+            <!-- 标签 -->
+            <div class="inline-flex items-center gap-2 glass rounded-full px-4 py-2 mb-8">
+                <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+                <span class="text-sm text-gray-300">最新版本 2026.12.0-alpha 已发布</span>
+            </div>
+
+            <!-- 主标题 -->
+            <h1 class="text-7xl font-extrabold mb-6 bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 text-transparent bg-clip-text leading-tight">
+                下一代飞控系统
+            </h1>
+
+            <p class="text-2xl text-gray-400 mb-12 max-w-3xl mx-auto leading-relaxed">
+                为多旋翼无人机提供超低延迟控制、智能滤波、<br/>实时调参的专业级飞行控制解决方案
+            </p>
+
+            <!-- CTA 按钮组 -->
+            <div class="flex gap-4 justify-center mb-16">
+                <button class="glow-btn bg-gradient-to-r from-purple-500 to-blue-500 text-white px-8 py-4 rounded-full text-lg font-semibold hover:shadow-xl hover:shadow-purple-500/50 transition flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                    </svg>
+                    立即开始
+                </button>
+                <button class="glass text-white px-8 py-4 rounded-full text-lg font-semibold hover:bg-white/10 transition flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                    </svg>
+                    下载固件
+                </button>
+            </div>
+
+            <!-- 大屏展示 -->
+            <div class="relative mx-auto max-w-5xl">
+                <div class="glass rounded-2xl p-2 hover-card">
+                    <div class="bg-gradient-to-br from-gray-900 to-gray-800 rounded-xl p-8 aspect-video flex items-center justify-center">
+                        <div class="text-center">
+                            <div class="w-24 h-24 bg-gradient-to-br from-purple-500 to-blue-500 rounded-2xl mx-auto mb-4 flex items-center justify-center">
+                                <svg class="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                                </svg>
+                            </div>
+                            <p class="text-gray-400">Configurator 界面预览</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 核心特性 -->
+    <section class="relative py-32">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-20">
+                <h2 class="text-5xl font-bold mb-4 text-white">强大的核心特性</h2>
+                <p class="text-xl text-gray-400">为专业飞手打造的完整解决方案</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- 特性 1 -->
+                <div class="glass rounded-2xl p-8 hover-card">
+                    <div class="w-14 h-14 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center mb-6">
+                        <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4 text-white">8K PID Loop</h3>
+                    <p class="text-gray-400 leading-relaxed">
+                        超高频率的 PID 循环，提供极致的响应速度和飞行稳定性，竞速穿越机的不二之选
+                    </p>
+                    <div class="mt-6 pt-6 border-t border-white/10">
+                        <div class="flex items-center gap-2 text-sm text-purple-400">
+                            <span class="font-semibold">延迟:</span>
+                            <span>0.125ms</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 特性 2 -->
+                <div class="glass rounded-2xl p-8 hover-card">
+                    <div class="w-14 h-14 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center mb-6">
+                        <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4 text-white">RPM 滤波</h3>
+                    <p class="text-gray-400 leading-relaxed">
+                        基于电机转速的智能滤波系统，精准消除电机噪声，获得更纯净的飞行体验
+                    </p>
+                    <div class="mt-6 pt-6 border-t border-white/10">
+                        <div class="flex items-center gap-2 text-sm text-blue-400">
+                            <span class="font-semibold">噪声抑制:</span>
+                            <span>-40dB</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 特性 3 -->
+                <div class="glass rounded-2xl p-8 hover-card">
+                    <div class="w-14 h-14 bg-gradient-to-br from-green-500 to-emerald-500 rounded-xl flex items-center justify-center mb-6">
+                        <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4 text-white">无线调参</h3>
+                    <p class="text-gray-400 leading-relaxed">
+                        支持蓝牙、WiFi 无线连接，随时随地调整参数，无需拆卸飞机或连接数据线
+                    </p>
+                    <div class="mt-6 pt-6 border-t border-white/10">
+                        <div class="flex items-center gap-2 text-sm text-green-400">
+                            <span class="font-semibold">协议:</span>
+                            <span>BLE 5.0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 技术数据 -->
+    <section class="relative py-32 bg-gradient-to-b from-transparent via-purple-900/10 to-transparent">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="glass rounded-3xl p-12">
+                <h2 class="text-4xl font-bold text-center mb-16 text-white">性能数据</h2>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-12">
+                    <div class="text-center">
+                        <div class="text-5xl font-extrabold bg-gradient-to-r from-purple-400 to-pink-400 text-transparent bg-clip-text mb-2">8K</div>
+                        <div class="text-gray-400">PID 循环频率</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-5xl font-extrabold bg-gradient-to-r from-blue-400 to-cyan-400 text-transparent bg-clip-text mb-2">0.1ms</div>
+                        <div class="text-gray-400">系统延迟</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-5xl font-extrabold bg-gradient-to-r from-green-400 to-emerald-400 text-transparent bg-clip-text mb-2">500+</div>
+                        <div class="text-gray-400">支持飞控型号</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-5xl font-extrabold bg-gradient-to-r from-orange-400 to-red-400 text-transparent bg-clip-text mb-2">100M+</div>
+                        <div class="text-gray-400">全球下载量</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA 区域 -->
+    <section class="relative py-32">
+        <div class="max-w-4xl mx-auto px-6 text-center">
+            <div class="glass rounded-3xl p-16">
+                <h2 class="text-5xl font-bold mb-6 text-white">准备起飞了吗？</h2>
+                <p class="text-xl text-gray-400 mb-10">立即下载固件，体验专业级飞控系统</p>
+                <div class="flex gap-4 justify-center">
+                    <button class="glow-btn bg-gradient-to-r from-purple-500 to-blue-500 text-white px-10 py-4 rounded-full text-lg font-semibold hover:shadow-xl hover:shadow-purple-500/50 transition">
+                        下载最新版本
+                    </button>
+                    <button class="glass text-white px-10 py-4 rounded-full text-lg font-semibold hover:bg-white/10 transition">
+                        查看文档
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="relative border-t border-white/10 py-12">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+                <div>
+                    <div class="flex items-center gap-2 mb-4">
+                        <div class="w-8 h-8 bg-gradient-to-br from-purple-500 to-blue-500 rounded-lg"></div>
+                        <span class="text-lg font-bold text-white">Betaflight</span>
+                    </div>
+                    <p class="text-gray-400 text-sm">专业飞控系统开源项目</p>
+                </div>
+                <div>
+                    <h3 class="text-white font-semibold mb-4">产品</h3>
+                    <ul class="space-y-2 text-gray-400 text-sm">
+                        <li><a href="#" class="hover:text-white transition">Configurator</a></li>
+                        <li><a href="#" class="hover:text-white transition">固件下载</a></li>
+                        <li><a href="#" class="hover:text-white transition">Blackbox</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-white font-semibold mb-4">资源</h3>
+                    <ul class="space-y-2 text-gray-400 text-sm">
+                        <li><a href="#" class="hover:text-white transition">使用文档</a></li>
+                        <li><a href="#" class="hover:text-white transition">开发指南</a></li>
+                        <li><a href="#" class="hover:text-white transition">API 参考</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-white font-semibold mb-4">社区</h3>
+                    <ul class="space-y-2 text-gray-400 text-sm">
+                        <li><a href="#" class="hover:text-white transition">GitHub</a></li>
+                        <li><a href="#" class="hover:text-white transition">Discord</a></li>
+                        <li><a href="#" class="hover:text-white transition">论坛</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-white/10 pt-8 text-center text-gray-400 text-sm">
+                <p>&copy; 2026 Betaflight. 开源项目 GPLv3 协议</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // 生成粒子背景
+        const particlesContainer = document.getElementById('particles');
+        for (let i = 0; i < 50; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.animationDelay = Math.random() * 20 + 's';
+            particle.style.animationDuration = (Math.random() * 10 + 15) + 's';
+            particlesContainer.appendChild(particle);
+        }
+    </script>
+</body>
+</html>

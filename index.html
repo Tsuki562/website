@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Betaflight - 飞控系统</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background: #F7F5F1; color: #1E2227; }
+        h1, h2, h3 { font-family: 'Playfair Display', serif; }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="sticky top-0 backdrop-blur-md bg-white/80 border-b border-[#E7E3DA] z-50">
+        <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+            <div class="text-2xl font-bold" style="font-family: 'Playfair Display', serif;">Betaflight</div>
+            <div class="flex gap-8 items-center">
+                <a href="index.html" class="text-[#1E2227] hover:text-[#3C5A78] transition">首页</a>
+                <a href="pages/products.html" class="text-[#1E2227] hover:text-[#3C5A78] transition">产品</a>
+                <a href="pages/downloads.html" class="text-[#1E2227] hover:text-[#3C5A78] transition">下载中心</a>
+                <a href="http://localhost:8080" target="_blank" class="bg-[#3C5A78] hover:bg-[#2E4760] text-white px-5 py-2 rounded-lg transition">打开 Configurator</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero 区域 -->
+    <section class="max-w-6xl mx-auto px-6 py-20 text-center">
+        <div class="inline-block bg-white border border-[#E7E3DA] rounded-full px-4 py-1 text-sm text-[#6B7077] mb-6">
+            开源飞控系统
+        </div>
+        <h1 class="text-6xl font-bold mb-6 tracking-tight">专业级飞控解决方案</h1>
+        <p class="text-xl text-[#6B7077] mb-10 max-w-2xl mx-auto">
+            为多旋翼、固定翼等多种飞行器提供稳定可靠的飞行控制系统，支持自定义配置与实时调参
+        </p>
+        <div class="flex gap-4 justify-center">
+            <a href="http://localhost:8080" target="_blank" class="bg-[#3C5A78] hover:bg-[#2E4760] text-white px-8 py-3 rounded-lg font-medium transition">
+                启动 Configurator
+            </a>
+            <a href="pages/downloads.html" class="bg-white hover:bg-gray-50 border border-[#E7E3DA] text-[#1E2227] px-8 py-3 rounded-lg font-medium transition">
+                下载固件
+            </a>
+        </div>
+    </section>
+
+    <!-- 大图展示 -->
+    <section class="max-w-5xl mx-auto px-6 mb-20">
+        <div class="bg-white rounded-2xl overflow-hidden shadow-sm border border-[#E7E3DA]">
+            <img src="https://raw.githubusercontent.com/betaflight/.github/main/profile/images/bf_logo.svg"
+                 alt="Betaflight"
+                 class="w-full h-96 object-cover bg-gradient-to-br from-gray-100 to-gray-200">
+        </div>
+    </section>
+
+    <!-- 功能特性 -->
+    <section class="max-w-6xl mx-auto px-6 py-20">
+        <h2 class="text-4xl font-bold text-center mb-16">核心特性</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <!-- 特性 1 -->
+            <div class="bg-white rounded-xl p-8 border border-[#E7E3DA] hover:shadow-md transition">
+                <div class="inline-block bg-[#F7F5F1] rounded-lg px-3 py-1 text-xs text-[#6B7077] mb-4">实时调参</div>
+                <h3 class="text-2xl font-semibold mb-4">网页端配置</h3>
+                <p class="text-[#6B7077] leading-relaxed">
+                    通过 WebUSB/WebSerial 技术，直接在浏览器中连接飞控进行实时调参，无需安装客户端
+                </p>
+            </div>
+
+            <!-- 特性 2 -->
+            <div class="bg-white rounded-xl p-8 border border-[#E7E3DA] hover:shadow-md transition">
+                <div class="inline-block bg-[#F7F5F1] rounded-lg px-3 py-1 text-xs text-[#6B7077] mb-4">固件管理</div>
+                <h3 class="text-2xl font-semibold mb-4">版本自动匹配</h3>
+                <p class="text-[#6B7077] leading-relaxed">
+                    自动检测飞控固件版本，智能推荐最新兼容固件，一键更新固件
+                </p>
+            </div>
+
+            <!-- 特性 3 -->
+            <div class="bg-white rounded-xl p-8 border border-[#E7E3DA] hover:shadow-md transition">
+                <div class="inline-block bg-[#F7F5F1] rounded-lg px-3 py-1 text-xs text-[#6B7077] mb-4">蓝牙连接</div>
+                <h3 class="text-2xl font-semibold mb-4">无线调参</h3>
+                <p class="text-[#6B7077] leading-relaxed">
+                    支持通过 Web Bluetooth API 实现蓝牙连接，无需数据线即可完成飞控配置
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 快速开始 -->
+    <section class="max-w-4xl mx-auto px-6 py-20 text-center">
+        <h2 class="text-4xl font-bold mb-6">准备起飞</h2>
+        <p class="text-lg text-[#6B7077] mb-10">三步完成飞控配置</p>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-left">
+            <div class="bg-white rounded-xl p-6 border border-[#E7E3DA]">
+                <div class="text-3xl font-bold text-[#3C5A78] mb-3">1</div>
+                <h3 class="text-xl font-semibold mb-2">下载固件</h3>
+                <p class="text-[#6B7077]">选择对应飞控型号的固件文件</p>
+            </div>
+            <div class="bg-white rounded-xl p-6 border border-[#E7E3DA]">
+                <div class="text-3xl font-bold text-[#3C5A78] mb-3">2</div>
+                <h3 class="text-xl font-semibold mb-2">连接飞控</h3>
+                <p class="text-[#6B7077]">USB/蓝牙连接飞控到电脑</p>
+            </div>
+            <div class="bg-white rounded-xl p-6 border border-[#E7E3DA]">
+                <div class="text-3xl font-bold text-[#3C5A78] mb-3">3</div>
+                <h3 class="text-xl font-semibold mb-2">烧录配置</h3>
+                <p class="text-[#6B7077]">使用 Configurator 烧录并调参</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="border-t border-[#E7E3DA] mt-20">
+        <div class="max-w-6xl mx-auto px-6 py-12 text-center text-[#6B7077]">
+            <p>&copy; 2026 Betaflight. 开源项目 GPLv3 协议</p>
+            <div class="mt-4 flex gap-6 justify-center">
+                <a href="https://github.com/betaflight" class="hover:text-[#3C5A78] transition">GitHub</a>
+                <a href="#" class="hover:text-[#3C5A78] transition">文档</a>
+                <a href="#" class="hover:text-[#3C5A78] transition">社区</a>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

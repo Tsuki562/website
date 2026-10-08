@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>产品列表 - Betaflight</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background: #F7F5F1; color: #1E2227; }
+        h1, h2, h3 { font-family: 'Playfair Display', serif; }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="sticky top-0 backdrop-blur-md bg-white/80 border-b border-[#E7E3DA] z-50">
+        <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+            <a href="../index.html" class="text-2xl font-bold" style="font-family: 'Playfair Display', serif;">Betaflight</a>
+            <div class="flex gap-8 items-center">
+                <a href="../index.html" class="text-[#1E2227] hover:text-[#3C5A78] transition">首页</a>
+                <a href="products.html" class="text-[#3C5A78] font-medium">产品</a>
+                <a href="downloads.html" class="text-[#1E2227] hover:text-[#3C5A78] transition">下载中心</a>
+                <a href="http://localhost:8080" target="_blank" class="bg-[#3C5A78] hover:bg-[#2E4760] text-white px-5 py-2 rounded-lg transition">打开 Configurator</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 页面标题 -->
+    <section class="max-w-6xl mx-auto px-6 py-16 text-center">
+        <h1 class="text-5xl font-bold mb-4">支持的飞控产品</h1>
+        <p class="text-lg text-[#6B7077]">适配多种主流飞控硬件平台</p>
+    </section>
+
+    <!-- 产品列表 -->
+    <section class="max-w-6xl mx-auto px-6 pb-20">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+            <!-- 产品卡片 1 -->
+            <div class="bg-white rounded-xl overflow-hidden border border-[#E7E3DA] hover:shadow-lg transition">
+                <div class="h-48 bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center">
+                    <span class="text-4xl font-bold text-blue-700">F722</span>
+                </div>
+                <div class="p-6">
+                    <div class="inline-block bg-[#F7F5F1] rounded px-2 py-1 text-xs text-[#6B7077] mb-3">STM32F722</div>
+                    <h3 class="text-xl font-semibold mb-2">MATEKF722</h3>
+                    <p class="text-[#6B7077] text-sm mb-4">
+                        高性能 F7 飞控，216MHz 主频，支持完整 OSD、黑匣子记录
+                    </p>
+                    <div class="space-y-1 text-sm text-[#6B7077] mb-4">
+                        <div>• MCU: STM32F722RET6</div>
+                        <div>• 陀螺仪: ICM42688P</div>
+                        <div>• 输入电压: 2-6S</div>
+                    </div>
+                    <a href="downloads.html#MATEKF722" class="block text-center bg-[#3C5A78] hover:bg-[#2E4760] text-white py-2 rounded-lg transition">
+                        下载固件
+                    </a>
+                </div>
+            </div>
+
+            <!-- 产品卡片 2 -->
+            <div class="bg-white rounded-xl overflow-hidden border border-[#E7E3DA] hover:shadow-lg transition">
+                <div class="h-48 bg-gradient-to-br from-purple-100 to-purple-200 flex items-center justify-center">
+                    <span class="text-4xl font-bold text-purple-700">F405</span>
+                </div>
+                <div class="p-6">
+                    <div class="inline-block bg-[#F7F5F1] rounded px-2 py-1 text-xs text-[#6B7077] mb-3">STM32F405</div>
+                    <h3 class="text-xl font-semibold mb-2">通用 F405</h3>
+                    <p class="text-[#6B7077] text-sm mb-4">
+                        经典 F4 飞控，168MHz 主频，稳定可靠的性能表现
+                    </p>
+                    <div class="space-y-1 text-sm text-[#6B7077] mb-4">
+                        <div>• MCU: STM32F405RGT6</div>
+                        <div>• 陀螺仪: MPU6000/BMI270</div>
+                        <div>• 输入电压: 2-4S</div>
+                    </div>
+                    <a href="downloads.html#F405" class="block text-center bg-[#3C5A78] hover:bg-[#2E4760] text-white py-2 rounded-lg transition">
+                        下载固件
+                    </a>
+                </div>
+            </div>
+
+            <!-- 产品卡片 3 -->
+            <div class="bg-white rounded-xl overflow-hidden border border-[#E7E3DA] hover:shadow-lg transition">
+                <div class="h-48 bg-gradient-to-br from-green-100 to-green-200 flex items-center justify-center">
+                    <span class="text-4xl font-bold text-green-700">H743</span>
+                </div>
+                <div class="p-6">
+                    <div class="inline-block bg-[#F7F5F1] rounded px-2 py-1 text-xs text-[#6B7077] mb-3">STM32H743</div>
+                    <h3 class="text-xl font-semibold mb-2">旗舰 H7</h3>
+                    <p class="text-[#6B7077] text-sm mb-4">
+                        旗舰级 H7 芯片，480MHz 超高性能，适合竞速/航拍
+                    </p>
+                    <div class="space-y-1 text-sm text-[#6B7077] mb-4">
+                        <div>• MCU: STM32H743VIT6</div>
+                        <div>• 陀螺仪: ICM42688P</div>
+                        <div>• 输入电压: 2-8S</div>
+                    </div>
+                    <a href="downloads.html#H743" class="block text-center bg-[#3C5A78] hover:bg-[#2E4760] text-white py-2 rounded-lg transition">
+                        下载固件
+                    </a>
+                </div>
+            </div>
+
+            <!-- 产品卡片 4 -->
+            <div class="bg-white rounded-xl overflow-hidden border border-[#E7E3DA] hover:shadow-lg transition">
+                <div class="h-48 bg-gradient-to-br from-orange-100 to-orange-200 flex items-center justify-center">
+                    <span class="text-4xl font-bold text-orange-700">F411</span>
+                </div>
+                <div class="p-6">
+                    <div class="inline-block bg-[#F7F5F1] rounded px-2 py-1 text-xs text-[#6B7077] mb-3">STM32F411</div>
+                    <h3 class="text-xl font-semibold mb-2">入门级 F411</h3>
+                    <p class="text-[#6B7077] text-sm mb-4">
+                        入门级 F4 飞控，100MHz 主频，适合小型穿越机
+                    </p>
+                    <div class="space-y-1 text-sm text-[#6B7077] mb-4">
+                        <div>• MCU: STM32F411CEU6</div>
+                        <div>• 陀螺仪: MPU6000</div>
+                        <div>• 输入电压: 1-3S</div>
+                    </div>
+                    <a href="downloads.html#F411" class="block text-center bg-[#3C5A78] hover:bg-[#2E4760] text-white py-2 rounded-lg transition">
+                        下载固件
+                    </a>
+                </div>
+            </div>
+
+            <!-- 产品卡片 5 -->
+            <div class="bg-white rounded-xl overflow-hidden border border-[#E7E3DA] hover:shadow-lg transition">
+                <div class="h-48 bg-gradient-to-br from-red-100 to-red-200 flex items-center justify-center">
+                    <span class="text-4xl font-bold text-red-700">G4</span>
+                </div>
+                <div class="p-6">
+                    <div class="inline-block bg-[#F7F5F1] rounded px-2 py-1 text-xs text-[#6B7077] mb-3">STM32G4</div>
+                    <h3 class="text-xl font-semibold mb-2">新架构 G4</h3>
+                    <p class="text-[#6B7077] text-sm mb-4">
+                        新一代 G4 系列，170MHz，更低功耗更高效率
+                    </p>
+                    <div class="space-y-1 text-sm text-[#6B7077] mb-4">
+                        <div>• MCU: STM32G473</div>
+                        <div>• 陀螺仪: BMI270</div>
+                        <div>• 输入电压: 2-6S</div>
+                    </div>
+                    <a href="downloads.html#G473" class="block text-center bg-[#3C5A78] hover:bg-[#2E4760] text-white py-2 rounded-lg transition">
+                        下载固件
+                    </a>
+                </div>
+            </div>
+
+            <!-- 自定义 Target -->
+            <div class="bg-white rounded-xl overflow-hidden border-2 border-[#3C5A78] hover:shadow-lg transition">
+                <div class="h-48 bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center">
+                    <span class="text-3xl font-bold text-slate-700">Custom</span>
+                </div>
+                <div class="p-6">
+                    <div class="inline-block bg-[#3C5A78] text-white rounded px-2 py-1 text-xs mb-3">自定义配置</div>
+                    <h3 class="text-xl font-semibold mb-2">自定义 Target</h3>
+                    <p class="text-[#6B7077] text-sm mb-4">
+                        不在公共列表的飞控型号，支持自定义配置编译
+                    </p>
+                    <div class="space-y-1 text-sm text-[#6B7077] mb-4">
+                        <div>• 按需编译</div>
+                        <div>• 自定义引脚映射</div>
+                        <div>• 实验性功能</div>
+                    </div>
+                    <a href="downloads.html#custom" class="block text-center bg-white border-2 border-[#3C5A78] text-[#3C5A78] hover:bg-[#3C5A78] hover:text-white py-2 rounded-lg transition">
+                        配置编译
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="border-t border-[#E7E3DA] mt-20">
+        <div class="max-w-6xl mx-auto px-6 py-12 text-center text-[#6B7077]">
+            <p>&copy; 2026 Betaflight. 开源项目 GPLv3 协议</p>
+            <div class="mt-4 flex gap-6 justify-center">
+                <a href="https://github.com/betaflight" class="hover:text-[#3C5A78] transition">GitHub</a>
+                <a href="#" class="hover:text-[#3C5A78] transition">文档</a>
+                <a href="#" class="hover:text-[#3C5A78] transition">社区</a>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

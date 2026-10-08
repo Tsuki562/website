@@ -1,0 +1,40 @@
+{
+  "description": "重山航空公开页面到 Nuxt 的保留路由映射。旧链接先保持路径不变，错误链接单独重定向。",
+  "routes": [
+    { "path": "/", "page": "home", "status": "scaffolded" },
+    { "path": "/products/", "page": "products", "status": "scaffolded" },
+    { "path": "/service/", "page": "service", "status": "scaffolded" },
+    { "path": "/contact/", "page": "contact", "status": "scaffolded" },
+    { "path": "/flightcontrol_service/", "page": "flight-control-service", "status": "scaffolded" },
+    { "path": "/f435-rgt7_service/", "page": "f435-rgt7", "status": "scaffolded" },
+    { "path": "/f435-vmt7_service/", "page": "f435-vmt7", "status": "scaffolded" },
+    { "path": "/trans_grid/", "page": "video-transmitter-downloads", "status": "scaffolded" },
+    { "path": "/g-motor/", "page": "engine-index", "status": "scaffolded" },
+    { "path": "/g-motor-se45/", "page": "engine-se45", "status": "scaffolded" },
+    { "path": "/g-motor-se110/", "page": "engine-se110", "status": "scaffolded" },
+    { "path": "/g-motor-se170/", "page": "engine-se170", "status": "scaffolded" },
+    { "path": "/g-motor-se275/", "page": "engine-se275", "status": "scaffolded" },
+    { "path": "/g-motor-se550/", "page": "engine-se550", "status": "scaffolded" },
+    { "path": "/batter-la40/", "page": "battery-placeholder", "status": "scaffolded" },
+    { "path": "/zhuangsir/", "page": "contact-card", "status": "scaffolded" },
+    { "path": "/downloads/", "page": "downloads", "status": "new" },
+    { "path": "/en/", "page": "home-en", "status": "scaffolded" },
+    { "path": "/en/首页-english/", "page": "home-en-legacy", "status": "scaffolded" },
+    { "path": "/en/products/", "page": "products-en", "status": "scaffolded" },
+    { "path": "/en/products-2/", "page": "products-en-legacy", "status": "scaffolded" },
+    { "path": "/en/products-3/", "page": "products-en-legacy-2", "status": "scaffolded" },
+    { "path": "/en/service/", "page": "service-en", "status": "scaffolded" },
+    { "path": "/en/contact/", "page": "contact-en", "status": "scaffolded" },
+    { "path": "/en/flightcontrol_service/", "page": "flight-control-service-en", "status": "scaffolded" },
+    { "path": "/en/g-motor/", "page": "engine-index-en", "status": "scaffolded" },
+    { "path": "/en/downloads/", "page": "downloads-en", "status": "new" }
+  ],
+  "redirects": [
+    { "from": "/.home", "to": "/", "code": 301 },
+    { "from": "/.product", "to": "/products/", "code": 301 },
+    { "from": "/test/", "to": "/flightcontrol_service/", "code": 301 },
+    { "from": "/69-2/", "to": "/products/", "code": 301 },
+    { "from": "/sample-page/", "to": "/", "code": 301 },
+    { "from": "/service-gps/", "to": "/service/", "code": 302 }
+  ]
+}
