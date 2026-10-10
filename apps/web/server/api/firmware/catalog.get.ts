@@ -1,8 +1,11 @@
-import { buildPresets, downloads } from "~~/shared/data/site";
+import { buildPresets } from "~~/shared/data/site";
+import { getDownloadsContent } from "../../utils/wordpress";
 
-export default defineEventHandler(() => ({
-  source: "demo",
-  downloads,
-  presets: buildPresets,
-  note: "Replace with WordPress firmware records after the content plugin is installed."
-}));
+export default defineEventHandler(async () => {
+  const result = await getDownloadsContent();
+  return {
+    source: result.source,
+    downloads: result.items,
+    presets: buildPresets
+  };
+});

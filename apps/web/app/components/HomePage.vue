@@ -18,9 +18,9 @@ const categories = computed(() => [
     description: isEnglish.value
       ? "A complete engine family from SE45 through SE550."
       : "覆盖 SE45 至 SE550 的航空发动机产品系列。",
-    image: "/images/site/engine.png",
+    image: "/images/site/engine-home-v2.png",
     href: localizedPath("/g-motor/"),
-    className: "featured"
+    className: "featured engine"
   },
   {
     name: isEnglish.value ? "High-current ESC" : "高性能电调",
@@ -42,9 +42,9 @@ const categories = computed(() => [
     name: isEnglish.value ? "Custom antennas" : "定制天线",
     label: isEnglish.value ? "RF system" : "射频系统",
     description: isEnglish.value ? "Custom frequency bands and structures with low VSWR." : "支持频段与结构定制，兼顾低驻波与一致性。",
-    image: "/images/site/antenna.png",
+    image: "/images/site/antenna-home-v2.png",
     href: localizedPath("/products/#antenna"),
-    className: "compact"
+    className: "compact antenna"
   }
 ]);
 

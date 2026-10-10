@@ -1,9 +1,20 @@
 <script setup lang="ts">
-import { downloads, products } from "~~/shared/data/site";
+import { downloads as demoDownloads, products as demoProducts } from "~~/shared/data/site";
+import type { DownloadItem, Product } from "~~/shared/types/content";
 const props = defineProps<{ productId: string }>();
 const { isEnglish, text, localizedPath } = useLocale();
-const product = computed(() => products.find((item) => item.id === props.productId) ?? products[0]!);
-const productDownloads = computed(() => downloads.filter((item) => item.productId === props.productId));
+const { data: productResult } = await useFetch<{ products: Product[]; source: string }>("/api/content/products", {
+  default: () => ({ products: [], source: "empty" })
+});
+const { data: downloadResult } = await useFetch<{ downloads: DownloadItem[] }>("/api/content/downloads", {
+  default: () => ({ downloads: [] })
+});
+const product = computed(() => {
+  const current = productResult.value?.products.find((item) => item.id === props.productId);
+  if (current) return current;
+  return productResult.value?.source === "wordpress" ? null : demoProducts.find((item) => item.id === props.productId) ?? null;
+});
+const productDownloads = computed(() => (downloadResult.value?.downloads ?? demoDownloads).filter((item) => item.productId === props.productId));
 const imageByProduct: Record<string, string> = {
   "f435-vmt7": "/images/site/flight-controller.jpg",
   "f435-rgt7": "/images/site/flight-controller.jpg",
@@ -13,7 +24,7 @@ const imageByProduct: Record<string, string> = {
 </script>
 
 <template>
-  <div>
+  <div v-if="product">
     <PageHero :eyebrow="text(product.eyebrow)" :title="product.name" :description="text(product.description)" />
     <section class="container content-section">
       <div class="detail-layout">
@@ -24,7 +35,7 @@ const imageByProduct: Record<string, string> = {
           <ul class="spec-list"><li v-for="highlight in product.highlights" :key="highlight.zh"><span>{{ text(highlight) }}</span><strong>✓</strong></li></ul>
         </article>
         <aside class="detail-card">
-          <img class="detail-product-image" :src="imageByProduct[product.id] || '/images/site/flight-controller.jpg'" :alt="product.name" />
+          <img class="detail-product-image" :src="product.image || imageByProduct[product.id] || '/images/site/flight-controller.jpg'" :alt="product.name" />
           <NuxtLink class="button-primary" style="margin-top: 18px;" :to="localizedPath('/downloads/')">{{ isEnglish ? "Open download center" : "进入下载中心" }}</NuxtLink>
         </aside>
       </div>
@@ -38,4 +49,7 @@ const imageByProduct: Record<string, string> = {
       </div>
     </section>
   </div>
+  <section v-else class="container content-section empty-state">
+    {{ isEnglish ? "This product is not published in the content catalog." : "该产品尚未在内容目录中发布。" }}
+  </section>
 </template>

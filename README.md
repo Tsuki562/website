@@ -24,6 +24,20 @@ npm run dev
 
 默认访问 <http://localhost:3000>。
 
+### 启动本地 WordPress 内容后台
+
+在 `website` 目录复制数据库密码模板并启动本地 WordPress（端口仅绑定本机）：
+
+```bash
+cp .env.wordpress.example .env.wordpress
+# 编辑 .env.wordpress，替换两个本地开发密码
+docker compose --env-file .env.wordpress -f docker-compose.wordpress.yml up -d
+```
+
+首次访问 <http://127.0.0.1:8080> 完成 WordPress 初始化。**CSHK Content Catalog** 作为 must-use 插件由 Compose 自动加载，无需在插件页手动启用。Nuxt 的 `.env.example` 已配置该本地 REST 地址；启动 Nuxt 后，产品和下载目录会优先读 WordPress 中已发布内容。未启动 WordPress 或 API 不可用时仍回退到演示数据，API 返回空列表时则展示空内容，不会把演示条目混进已接通的目录。
+
+旧站文件迁移清单、数据格式和导入步骤见 [WordPress 内容迁移说明](migration/wordpress/README.md)。导入脚本只接受本机 WordPress 地址，默认创建草稿；复核内容后可用 `--publish` 发布。
+
 Betaflight 地面站访问 <http://localhost:3000/betaflight/>。首次部署前需在项目根目录运行 `bash scripts/build-betaflight-app.sh` 生成地面站资源；生成结果不提交到 Git。
 
 编译服务在 `services/firmware` 运行 `npm start`，网站的 `FIRMWARE_API_BASE_URL` 需指向 `http://127.0.0.1:8090`（已有 `.env` 请补充此项）。所有 profile 默认禁用，开放前需完成工具链、构建选项和硬件验证，详见 [编译服务说明](services/firmware/README.md)。
@@ -32,9 +46,9 @@ Betaflight 地面站访问 <http://localhost:3000/betaflight/>。首次部署前
 
 ## 后续接入顺序
 
-1. 启动本地 WordPress 和 MariaDB，导入公开页面与媒体资料。
-2. 将 `server/api/content` 的演示数据切换为 WordPress REST API。
-3. 完成下载中心的数据模型和 WordPress 固件管理插件。
+1. 从旧站取得内容导出和原始媒体/下载文件，整理后导入本地 WordPress。
+2. 逐步把其余页面和内容类型接入已建立的 WordPress REST API。
+3. 完成下载中心审核流程及后续 WordPress 固件管理插件。
 4. 验证官方 Target 和私有 F435 Target 后，在白名单中逐项开放隔离编译 Worker。
 
 ## 目录说明

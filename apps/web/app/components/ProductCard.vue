@@ -11,12 +11,13 @@ const imageByProduct: Record<string, string> = {
   antenna: "/images/site/antenna.png",
   "se-engine": "/images/site/engine.png"
 };
+const image = computed(() => props.product.image || imageByProduct[props.product.id] || "/images/site/flight-controller.jpg");
 </script>
 
 <template>
   <article class="product-card" :id="product.id">
     <NuxtLink :to="localizedPath(product.href)" class="product-image-link">
-      <img :src="imageByProduct[product.id]" :alt="product.name" />
+      <img :src="image" :alt="product.name" />
     </NuxtLink>
     <div class="product-card-body">
       <p class="eyebrow">{{ text(product.eyebrow) }}</p>

@@ -1,0 +1,86 @@
+{
+  "products": [
+    {
+      "id": "f435-vmt7",
+      "name": "F435 VMT7",
+      "category": "flight-controller",
+      "eyebrow": { "zh": "AT32F435 系列飞控", "en": "AT32F435 flight controller" },
+      "description": { "zh": "高可靠性、高国产化率与优秀电路设计的飞控平台。", "en": "A reliable flight-control platform with a highly localized component design." },
+      "href": "/f435-vmt7_service/",
+      "imageFile": "../../apps/web/public/images/site/flight-controller.jpg",
+      "highlights": [
+        { "zh": "AT32F435 处理器", "en": "AT32F435 processor" },
+        { "zh": "支持 Betaflight", "en": "Betaflight support" },
+        { "zh": "说明书与接线图", "en": "Manuals and wiring diagrams" }
+      ]
+    },
+    {
+      "id": "f435-rgt7",
+      "name": "F435 RGT7",
+      "category": "flight-controller",
+      "eyebrow": { "zh": "AT32F435 系列飞控", "en": "AT32F435 flight controller" },
+      "description": { "zh": "面向多旋翼平台的 AT32 飞控，提供固件、驱动与刷写资料。", "en": "An AT32 flight controller with firmware, drivers and flashing resources." },
+      "href": "/f435-rgt7_service/",
+      "imageFile": "../../apps/web/public/images/site/flight-controller.jpg",
+      "highlights": [
+        { "zh": "标准版与扩展版本", "en": "Standard and extended variants" },
+        { "zh": "固件资料集中管理", "en": "Centralized firmware resources" },
+        { "zh": "后续支持在线编译", "en": "Online builds planned" }
+      ]
+    },
+    {
+      "id": "esc-45a",
+      "name": "45A ESC",
+      "category": "esc",
+      "eyebrow": { "zh": "高性能电调", "en": "High-performance ESC" },
+      "description": { "zh": "32 位高性能处理器与六层 3OZ 电路设计。", "en": "32-bit processing with a six-layer, 3OZ circuit design." },
+      "href": "/esc-45a/",
+      "imageFile": "../../apps/web/public/images/site/esc.jpg",
+      "highlights": [
+        { "zh": "C 型铜条", "en": "C-shaped copper busbar" },
+        { "zh": "超高电流设计", "en": "High-current design" }
+      ]
+    },
+    {
+      "id": "beacon-vtx",
+      "name": "Beacon",
+      "category": "video-transmitter",
+      "eyebrow": { "zh": "多频段图传", "en": "Multi-band video transmitter" },
+      "description": { "zh": "覆盖多种频段与功率规格的模拟图传产品系列。", "en": "Analog video transmitters spanning several bands and output levels." },
+      "href": "/trans_grid/",
+      "imageFile": "../../apps/web/public/images/site/vtx.jpg",
+      "highlights": [
+        { "zh": "2000mW / 2500mW", "en": "2000mW / 2500mW" },
+        { "zh": "高信噪比", "en": "High signal-to-noise ratio" }
+      ]
+    },
+    {
+      "id": "antenna",
+      "name": "定制天线",
+      "category": "antenna",
+      "eyebrow": { "zh": "天线", "en": "Antenna" },
+      "description": { "zh": "支持频段与结构形式定制，兼顾低驻波比与一致性。", "en": "Custom frequencies and formats with low VSWR and consistent quality." },
+      "href": "/products/#antenna",
+      "imageFile": "../../apps/web/public/images/site/antenna.png",
+      "highlights": [
+        { "zh": "可定制频段", "en": "Custom frequencies" },
+        { "zh": "可定制类型", "en": "Custom formats" }
+      ]
+    },
+    {
+      "id": "se-engine",
+      "name": "SE 系列发动机",
+      "category": "engine",
+      "eyebrow": { "zh": "航空发动机", "en": "Aero engine" },
+      "description": { "zh": "覆盖 SE45 至 SE550 的航空发动机产品系列。", "en": "Aero engines ranging from the SE45 through the SE550." },
+      "href": "/g-motor/",
+      "imageFile": "../../apps/web/public/images/site/engine.png",
+      "highlights": [
+        { "zh": "强劲动力", "en": "Strong output" },
+        { "zh": "可靠稳定", "en": "Reliable and stable" },
+        { "zh": "燃油经济", "en": "Fuel efficient" }
+      ]
+    }
+  ],
+  "downloads": []
+}
