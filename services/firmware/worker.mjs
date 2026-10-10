@@ -1,6 +1,6 @@
 import { spawn } from "node:child_process";
 import { createHash } from "node:crypto";
-import { mkdir, readdir, readFile, rm, stat } from "node:fs/promises";
+import { mkdir, readFile, rm, stat } from "node:fs/promises";
 import { join } from "node:path";
 
 export function runDocker(args) {
@@ -65,10 +65,10 @@ export class BuildQueue {
         new Promise((_, reject) => { timeout = setTimeout(() => reject(new Error("Build timeout")), this.config.buildTimeoutMs); })
       ]);
       if (handle.cancelled) return;
-      await this.execute(["cp", `${name}:/source/obj/.`, output]);
-      const files = (await readdir(output)).filter(file => file.endsWith(".hex"));
-      if (files.length !== 1) throw new Error("Expected exactly one HEX artifact");
-      const artifact = join(output, files[0]);
+      // Betaflight names the HEX from its compiled version and target; avoid copying stale or unrelated obj files.
+      const artifactName = `betaflight_${profile.release}_${profile.target}.hex`;
+      const artifact = join(output, artifactName);
+      await this.execute(["cp", `${name}:/source/obj/${artifactName}`, output]);
       const size = (await stat(artifact)).size;
       if (!size || size > 10 * 1024 * 1024) throw new Error("Invalid firmware artifact");
       const bytes = await readFile(artifact);
