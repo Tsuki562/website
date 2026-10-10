@@ -33,7 +33,8 @@ export default defineNuxtConfig({
   },
   nitro: {
     routeRules: {
-      "/api/**": { cors: true },
+      "/betaflight/**": { headers: { "Referrer-Policy": "no-referrer", "Permissions-Policy": "serial=(self), usb=(self)" } },
+      "/downloads/task/**": { headers: { "Referrer-Policy": "no-referrer", "Cache-Control": "no-store" } },
       "/.home": { redirect: { to: "/", statusCode: 301 } },
       "/.product": { redirect: { to: "/products/", statusCode: 301 } },
       "/test/": { redirect: { to: "/flightcontrol_service/", statusCode: 301 } },

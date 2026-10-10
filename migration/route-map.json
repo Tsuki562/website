@@ -18,6 +18,7 @@
     { "path": "/batter-la40/", "page": "battery-placeholder", "status": "scaffolded" },
     { "path": "/zhuangsir/", "page": "contact-card", "status": "scaffolded" },
     { "path": "/downloads/", "page": "downloads", "status": "new" },
+    { "path": "/betaflight/", "page": "betaflight-app", "status": "new" },
     { "path": "/en/", "page": "home-en", "status": "scaffolded" },
     { "path": "/en/首页-english/", "page": "home-en-legacy", "status": "scaffolded" },
     { "path": "/en/products/", "page": "products-en", "status": "scaffolded" },

@@ -1,0 +1,421 @@
+diff --git a/src/components/tabs/FirmwareFlasherTab.vue b/src/components/tabs/FirmwareFlasherTab.vue
+index 7a684fc6..937a06fd 100644
+--- a/src/components/tabs/FirmwareFlasherTab.vue
++++ b/src/components/tabs/FirmwareFlasherTab.vue
+@@ -140,7 +140,7 @@ import DeviceHandler from "../../js/device_handler";
+ import { gui_log } from "../../js/gui_log";
+ import semver from "semver";
+ import FileSystem from "../../js/FileSystem";
+-import AutoBackup, { getLastBackupData, resetLastBackupData } from "../../js/utils/AutoBackup.js";
++import AutoBackup, { resetLastBackupData } from "../../js/utils/AutoBackup.js";
+ import AutoRestore from "../../js/utils/AutoRestore.js";
+ import { EventBus } from "../eventBus";
+ import STM32 from "../../js/protocols/webstm32";
+@@ -941,7 +941,8 @@ export default defineComponent({
+ 
+                 // Assume flashing latest, so default to it.
+                 if (filteredReleases.length > 0) {
+-                    boardSelection.state.selectedFirmwareVersion = filteredReleases[0].release;
++                    const recommended = filteredReleases.find(release => release.type === "Stable") || filteredReleases[0];
++                    boardSelection.state.selectedFirmwareVersion = recommended.release;
+                     await selectFirmware(boardSelection.state.selectedFirmwareVersion);
+                 }
+             } else {
+@@ -977,7 +978,7 @@ export default defineComponent({
+ 
+         const setupEventBusListeners = () => {
+             const { detectedUsbDevice, onDeviceRemoved } = firmwareFlashing.setupFlashingEventListeners({
+-                getFlashOnConnect: () => state.flashOnConnect,
++                getFlashOnConnect: () => false,
+                 onBoardChange,
+                 clearBufferedFirmware,
+                 updateDfuExitButtonState,
+@@ -1014,6 +1015,29 @@ export default defineComponent({
+             await setupUIHandlers();
+             setupEventBusListeners();
+ 
++            const resumeKey = new URLSearchParams(window.location.search).get("job");
++            if (resumeKey && /^[a-f0-9]{32}\.[A-Za-z0-9_-]{32}$/.test(resumeKey)) {
++                try {
++                    const detail = await buildApi.fetchJson(`${buildApi._url}/api/builds/${resumeKey}/log`);
++                    const job = detail?.job;
++                    if (job) {
++                        boardSelection.state.selectedBoard = job.target;
++                        state.targetDetail = { target: job.target, release: job.release, cloudBuild: true };
++                        state.targetSpanText = job.target;
++                        state.cloudTargetInfoVisible = true;
++                        activeFlasherStep.value = "flash";
++                        cloudBuild.resumeBuild({
++                            key: resumeKey,
++                            file: job.fileName || `betaflight_${job.release}_${job.target}.hex`,
++                            url: `/api/builds/${resumeKey}/firmware`,
++                            taskUrl: `/downloads/task/${resumeKey.split(".")[0]}?token=${encodeURIComponent(resumeKey.split(".")[1])}`,
++                        });
++                    }
++                } catch (error) {
++                    flashingMessage(error.message, FLASH_MESSAGE_TYPES.INVALID);
++                }
++            }
++
+             // Register this module for backward compatibility
+             TABS.firmware_flasher = {
+                 targets: boardSelection.state.targets,
+@@ -1492,6 +1516,14 @@ export default defineComponent({
+                 return;
+             }
+ 
++            const chinese = navigator.language.toLowerCase().startsWith("zh");
++            const board = boardSelection.state.selectedBoard || state.targetSpanText || "Unknown";
++            const prompt = chinese
++                ? `即将刷写：${board}。请核对型号，误刷可能导致飞控无法工作。建议先备份当前参数到本机，备份不会上传。继续刷写？`
++                : `Flash ${board}? Verify the board model; incorrect firmware may disable your controller. Back up settings locally first; backups are not uploaded. Continue?`;
++            if (!window.confirm(prompt)) return;
++            state.flashOnConnect = false;
++
+             // Reset any previous backup cache before starting a new flash
+             resetLastBackupData();
+ 
+@@ -1715,8 +1747,9 @@ export default defineComponent({
+ 
+         // Handle restore backup functionality
+         const handleRestoreBackup = async () => {
+-            // Check if there's a backup available
+-            const backupData = getLastBackupData();
++            const file = await FileSystem.pickOpenFile("Local parameter backup / 本机参数备份", [".txt", ".cfg"]);
++            if (!file) return;
++            const backupData = await FileSystem.readFile(file);
+             if (!backupData) {
+                 dialog.openInfo(
+                     $t("warningTitle"),
+diff --git a/src/components/tabs/firmware-flasher/FlasherFlashTab.vue b/src/components/tabs/firmware-flasher/FlasherFlashTab.vue
+index 0dfd60fc..a1c64785 100644
+--- a/src/components/tabs/firmware-flasher/FlasherFlashTab.vue
++++ b/src/components/tabs/firmware-flasher/FlasherFlashTab.vue
+@@ -233,7 +233,6 @@ import UiBox from "@/components/elements/UiBox.vue";
+ import SettingRow from "@/components/elements/SettingRow.vue";
+ import ProgressRing from "@/components/ProgressRing.vue";
+ import { get as getConfig, set as setConfig } from "@/js/ConfigStorage";
+-import { getLastBackupData } from "@/js/utils/AutoBackup";
+ 
+ const props = defineProps({
+     state: { type: Object, required: true },
+@@ -289,8 +288,7 @@ watch(
+ // Restore progress busy flag (driven by the parent via shared state)
+ const restoreInProgress = computed(() => props.state.restoreInProgress);
+ 
+-// Show restore button only when flash succeeded, not flashing, restore not already
+-// done, and backup data exists.
++// Offer local file restore after a successful flash.
+ // Note: No longer checking DeviceHandler.portAvailable as it's stale after flash
+ const showRestoreButton = computed(() => {
+     if (props.state.flashingInProgress) {
+@@ -302,9 +300,7 @@ const showRestoreButton = computed(() => {
+     if (props.state.restoreInProgress || props.state.restoreCompleted) {
+         return false;
+     }
+-    // Only show if we have a backup available (checking for null or empty string)
+-    const backupData = getLastBackupData();
+-    return backupData !== null && backupData !== "";
++    return true;
+ });
+ </script>
+ 
+diff --git a/src/composables/useCloudBuild.js b/src/composables/useCloudBuild.js
+index 10f5833d..626afb84 100644
+--- a/src/composables/useCloudBuild.js
++++ b/src/composables/useCloudBuild.js
+@@ -67,10 +67,16 @@ export function useCloudBuild(params) {
+     /**
+      * Handle cancel build button click
+      */
+-    const handleCancelBuild = () => {
++    const handleCancelBuild = async () => {
+         if (!state.cancelBuildButtonDisabled) {
+             state.cancelBuildButtonDisabled = true;
+-            state.cancelBuild = true;
++            try {
++                await buildApi.cancelBuild(state.cloudBuildKey);
++                state.cancelBuild = true;
++            } catch (error) {
++                state.cancelBuildButtonDisabled = false;
++                updateCloudBuildStatus(error.message);
++            }
+         }
+     };
+ 
+@@ -114,7 +120,7 @@ export function useCloudBuild(params) {
+             return;
+         }
+ 
+-        const logUrl = `https://build.betaflight.com/api/builds/${response.key}/log`;
++        const logUrl = response.taskUrl;
+         state.cloudTargetLogText = $t(`firmwareFlasherCloudBuildLogUrl`);
+         state.cloudTargetLogUrl = logUrl;
+         state.cloudTargetStatusText = $t(`firmwareFlasherCloudBuildSuccess${suffix}`);
+@@ -247,7 +253,7 @@ export function useCloudBuild(params) {
+             suffix = "Cancel";
+         }
+ 
+-        const logUrl = `https://build.betaflight.com/api/builds/${response.key}/log`;
++        const logUrl = response.taskUrl;
+         setCloudBuildLogLink($t(`firmwareFlasherCloudBuildLogUrl`), logUrl);
+         updateCloudBuildStatus($t(`firmwareFlasherCloudBuildFail${suffix}`), 0);
+         enableLoadRemoteFileButton(true);
+@@ -284,7 +290,7 @@ export function useCloudBuild(params) {
+             }
+             const retryTotal = timeout / retrySeconds;
+ 
+-            const shouldStopPolling = statusResponse.status !== "queued" || retries > retryTotal || state.cancelBuild;
++            const shouldStopPolling = statusResponse.status !== "queued" || state.cancelBuild;
+             if (shouldStopPolling) {
+                 enableCancelBuildButton(false);
+                 stopPolling();
+@@ -324,6 +330,11 @@ export function useCloudBuild(params) {
+         }
+ 
+         console.info("[CLOUD_BUILD] Build response:", response);
++        state.cloudBuildKey = response.key;
++        setCloudBuildLogLink("任务 / Task", response.taskUrl);
++        const resumeUrl = new URL(window.location.href);
++        resumeUrl.searchParams.set("job", response.key);
++        window.history.replaceState(null, "", resumeUrl);
+ 
+         // If not a cloud build, download directly
+         if (!targetDetail.cloudBuild) {
+@@ -369,6 +380,15 @@ export function useCloudBuild(params) {
+         stopPolling();
+     };
+ 
++    /** Reattach polling to a task kept in the bookmarked page URL. */
++    const resumeBuild = (response) => {
++        state.cloudBuildKey = response.key;
++        setCloudBuildLogLink("任务 / Task", response.taskUrl);
++        enableCancelBuildButton(true);
++        stopPolling();
++        pollCloudBuildStatus(response, false);
++    };
++
+     onScopeDispose(cleanup);
+ 
+     return {
+@@ -377,6 +397,7 @@ export function useCloudBuild(params) {
+ 
+         // Methods
+         requestCloudBuild,
++        resumeBuild,
+         updateCloudBuildStatus,
+         setCloudBuildLogLink,
+         enableCancelBuildButton,
+diff --git a/src/composables/useFirmwareFlashing.js b/src/composables/useFirmwareFlashing.js
+index 2e66041c..6aec1099 100644
+--- a/src/composables/useFirmwareFlashing.js
++++ b/src/composables/useFirmwareFlashing.js
+@@ -529,7 +529,7 @@ export function useFirmwareFlashing(params = {}) {
+             return;
+         }
+ 
+-        const backupOnFlash = getConfig("backupOnFlash", 1).backupOnFlash;
++        const backupOnFlash = getConfig("backupOnFlash", 2).backupOnFlash;
+         report("backup-decision", { backupOnFlash });
+ 
+         switch (backupOnFlash) {
+diff --git a/src/css/dark-theme.less b/src/css/dark-theme.less
+index a71d3343..bae3c553 100644
+--- a/src/css/dark-theme.less
++++ b/src/css/dark-theme.less
+@@ -18,7 +18,7 @@
+         }
+     }
+     .tab-landing {
+-        background-image: url(../../images/pattern_dark.png);
++        background-image: url(/betaflight/images/pattern_dark.png);
+         .logowrapper {
+             img {
+                 content: url(../images/bf_logo_black.svg);
+diff --git a/src/css/main.less b/src/css/main.less
+index a14dca4b..41398039 100644
+--- a/src/css/main.less
++++ b/src/css/main.less
+@@ -578,7 +578,7 @@ dialog {
+         width: 1.5rem;
+         aspect-ratio: 1;
+         content: "";
+-        mask: url(../images/corner.svg);
++        mask: url(/betaflight/images/corner.svg);
+         background-color: var(--surface-300);
+         position: absolute;
+         left: -1.5rem;
+diff --git a/src/js/Analytics.js b/src/js/Analytics.js
+index 927b1169..66e043fc 100644
+--- a/src/js/Analytics.js
++++ b/src/js/Analytics.js
+@@ -21,7 +21,7 @@ function setupAnalytics(result) {
+         setConfig({ userId: userId });
+     }
+ 
+-    const optOut = !!result.analyticsOptOut;
++    const optOut = true;
+     const checkForDebugVersions = !!result.checkForConfiguratorUnstableVersions;
+ 
+     const settings = {
+diff --git a/src/js/BuildApi.js b/src/js/BuildApi.js
+index 45751cd8..f06ddad5 100644
+--- a/src/js/BuildApi.js
++++ b/src/js/BuildApi.js
+@@ -6,7 +6,8 @@ import LoginApi from "./LoginApi";
+ 
+ export default class BuildApi {
+     constructor(loginApi = new LoginApi()) {
+-        this._url = "https://build.betaflight.com";
++        this._url = "/api/betaflight";
++        this._target = "";
+         this._cacheExpirationPeriod = 3600 * 1000;
+         this._loginApi = loginApi;
+     }
+@@ -138,6 +139,7 @@ export default class BuildApi {
+     }
+ 
+     async loadTarget(target, release) {
++        this._target = target;
+         const url = `${this._url}/api/builds/${release}/${target}`;
+         return await this.fetchCachedJson(url);
+     }
+@@ -207,12 +209,12 @@ export default class BuildApi {
+     }
+ 
+     async loadOptions(release) {
+-        const url = `${this._url}/api/options/${release}`;
++        const url = `${this._url}/api/options/${release}?target=${encodeURIComponent(this._target)}`;
+         return await this.fetchJson(url);
+     }
+ 
+     async loadOptionsByBuildKey(release, key) {
+-        const url = `${this._url}/api/options/${release}/${key}`;
++        const url = `${this._url}/api/options/${release}?target=${encodeURIComponent(this._target)}`;
+         return await this.fetchJson(url);
+     }
+ 
+@@ -221,6 +223,13 @@ export default class BuildApi {
+         return await this.fetchJson(url);
+     }
+ 
++    /** Cancel an authenticated anonymous build on the local service. */
++    async cancelBuild(key) {
++        const response = await fetch(`${this._url}/api/builds/${key}/cancel`, { method: "POST" });
++        if (!response.ok) throw new Error("Unable to cancel build");
++        return response.json();
++    }
++
+     async loadConfiguratorRelease(type) {
+         const url = `${this._url}/api/app/releases/${type}`;
+         return await this.fetchJson(url);
+diff --git a/src/js/protocols/usbdfu.js b/src/js/protocols/usbdfu.js
+index f05e50e1..14f4ec8a 100644
+--- a/src/js/protocols/usbdfu.js
++++ b/src/js/protocols/usbdfu.js
+@@ -1281,7 +1281,7 @@ export class UsbDfuProtocol extends EventTarget {
+                                 if (getConfig("showNotifications").showNotifications) {
+                                     NotificationManager.showNotification("Betaflight App", {
+                                         body: i18n.getMessage("programmingSuccessfulNotification"),
+-                                        icon: "/images/pwa/favicon.ico",
++                                        icon: "/betaflight/images/pwa/favicon.ico",
+                                     });
+                                 }
+ 
+@@ -1299,7 +1299,7 @@ export class UsbDfuProtocol extends EventTarget {
+                                 if (getConfig("showNotifications").showNotifications) {
+                                     NotificationManager.showNotification("Betaflight App", {
+                                         body: i18n.getMessage("programmingFailedNotification"),
+-                                        icon: "/images/pwa/favicon.ico",
++                                        icon: "/betaflight/images/pwa/favicon.ico",
+                                     });
+                                 }
+ 
+diff --git a/src/js/protocols/webstm32.js b/src/js/protocols/webstm32.js
+index d3a3f2fe..a3462a5f 100644
+--- a/src/js/protocols/webstm32.js
++++ b/src/js/protocols/webstm32.js
+@@ -977,7 +977,7 @@ class STM32Protocol {
+                             if (getConfig("showNotifications").showNotifications) {
+                                 NotificationManager.showNotification("Betaflight App", {
+                                     body: i18n.getMessage("programmingSuccessfulNotification"),
+-                                    icon: "/images/pwa/favicon.ico",
++                                    icon: "/betaflight/images/pwa/favicon.ico",
+                                 });
+                             }
+ 
+@@ -995,7 +995,7 @@ class STM32Protocol {
+                             if (getConfig("showNotifications").showNotifications) {
+                                 NotificationManager.showNotification("Betaflight App", {
+                                     body: i18n.getMessage("programmingFailedNotification"),
+-                                    icon: "/images/pwa/favicon.ico",
++                                    icon: "/betaflight/images/pwa/favicon.ico",
+                                 });
+                             }
+ 
+diff --git a/src/js/utils/checkCompatibility.js b/src/js/utils/checkCompatibility.js
+index 507ebe75..00a0fd47 100644
+--- a/src/js/utils/checkCompatibility.js
++++ b/src/js/utils/checkCompatibility.js
+@@ -178,7 +178,7 @@ export function checkCompatibility() {
+     Object.assign(body.style, {
+         height: "100%",
+         display: "grid",
+-        backgroundImage: "url(/images/pattern_dark.png)",
++        backgroundImage: "url(/betaflight/images/pattern_dark.png)",
+         backgroundSize: "300px",
+         backgroundRepeat: "repeat",
+         backgroundColor: "var(--surface-500)",
+diff --git a/src/js/utils/map.js b/src/js/utils/map.js
+index 51440f95..aed182c6 100644
+--- a/src/js/utils/map.js
++++ b/src/js/utils/map.js
+@@ -8,9 +8,9 @@ import { Point } from "ol/geom";
+ const DEFAULT_ZOOM = 17;
+ const DEFAULT_LON = 0;
+ const DEFAULT_LAT = 0;
+-const ICON_IMAGE_GPS = "/images/icons/cf_icon_position.png";
+-const ICON_IMAGE_MAG = "/images/icons/cf_icon_position_mag.png";
+-const ICON_IMAGE_NOFIX = "/images/icons/cf_icon_position_nofix.png";
++const ICON_IMAGE_GPS = "/betaflight/images/icons/cf_icon_position.png";
++const ICON_IMAGE_MAG = "/betaflight/images/icons/cf_icon_position_mag.png";
++const ICON_IMAGE_NOFIX = "/betaflight/images/icons/cf_icon_position_nofix.png";
+ 
+ /**
+  * Create and configure an OpenLayers map instance for the GPS tab.
+diff --git a/vite.config.js b/vite.config.js
+index 5bfad6df..b6c59e21 100644
+--- a/vite.config.js
++++ b/vite.config.js
+@@ -145,7 +145,7 @@ function stripManifestFromSecondaryEntriesPlugin() {
+ }
+ 
+ export default defineConfig({
+-    base: "./", // Important for production APK asset paths
++    base: "/betaflight/",
+     define: {
+         __APP_VERSION__: JSON.stringify(pkg.version),
+         __APP_PRODUCTNAME__: JSON.stringify(pkg.productName),
+@@ -198,18 +198,20 @@ export default defineConfig({
+             },
+             includeAssets: ["favicon.ico", "apple-touch-icon.png"],
+             manifest: {
++                start_url: "/betaflight/",
++                scope: "/betaflight/",
+                 name: pkg.displayName,
+                 short_name: pkg.productName,
+                 description: pkg.description,
+                 theme_color: "#ffffff",
+                 icons: [
+                     {
+-                        src: "/images/pwa/pwa-192-192.png",
++                        src: "/betaflight/images/pwa/pwa-192-192.png",
+                         sizes: "192x192",
+                         type: "image/png",
+                     },
+                     {
+-                        src: "/images/pwa/pwa-512-512.png",
++                        src: "/betaflight/images/pwa/pwa-512-512.png",
+                         sizes: "512x512",
+                         type: "image/png",
+                     },

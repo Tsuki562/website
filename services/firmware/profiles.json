@@ -1,0 +1,25 @@
+{
+  "profiles": [
+    {
+      "enabled": false,
+      "target": "MATEKF722",
+      "manufacturer": "MATEK",
+      "hardwareVersion": "official-config",
+      "mcu": "STM32F722",
+      "release": "2026.6.2",
+      "releaseType": "Stable",
+      "commit": "e0b7bb01b17b21351057e9ead2d1ab39dd44fa16",
+      "image": "cshk-betaflight:2026.6.2",
+      "toolchain": "betaflight/betaflight-build:arm-2026.6 (digest pending verification)",
+      "allowedOptions": [],
+      "allowedOptionSets": [],
+      "fixedOptions": [],
+      "optionGroups": {
+        "radioProtocols": [],
+        "telemetryProtocols": [],
+        "motorProtocols": [],
+        "generalOptions": []
+      }
+    }
+  ]
+}

@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import type { BuildPreset, DownloadItem } from "~~/shared/types/content";
+import type { DownloadItem } from "~~/shared/types/content";
 import { channelLabels, firmwareKindLabels } from "../utils/display";
 
-const { isEnglish, text, localizedPath } = useLocale();
-const { data } = await useFetch<{ downloads: DownloadItem[]; presets: BuildPreset[] }>("/api/firmware/catalog", {
-  default: () => ({ downloads: [], presets: [] })
+const { isEnglish, text } = useLocale();
+const { data } = await useFetch<{ downloads: DownloadItem[] }>("/api/firmware/catalog", {
+  default: () => ({ downloads: [] })
 });
 
 const query = ref("");
@@ -16,7 +16,6 @@ const hardware = ref("");
 const date = ref("");
 
 const catalog = computed(() => data.value?.downloads ?? []);
-const presets = computed(() => data.value?.presets ?? []);
 const products = computed(() => [...new Set(catalog.value.map((item) => item.productName))]);
 const targets = computed(() => [...new Set(catalog.value.map((item) => item.target))]);
 const hardwareVersions = computed(() => [...new Set(catalog.value.map((item) => item.hardwareVersion))]);
@@ -37,43 +36,6 @@ const results = computed(() => {
   });
 });
 
-const selectedPreset = computed(() => presets.value[0]);
-const buildForm = reactive({
-  productId: "f435-vmt7",
-  target: "GREATMOUNTAINF435",
-  sourceRef: "stable-4.3.4",
-  presetId: "great-mountain-f435-preview",
-  notificationEmail: "",
-  options: {
-    receiver: "CRSF",
-    gps: "启用",
-    osd: "启用",
-    blackbox: "启用",
-    language: "简体中文"
-  } as Record<string, string>
-});
-const buildSubmitting = ref(false);
-const buildMessage = ref("");
-const buildError = ref(false);
-
-const submitBuild = async () => {
-  buildSubmitting.value = true;
-  buildMessage.value = "";
-  buildError.value = false;
-  try {
-    const result = await $fetch<{ id: string; accessToken: string; message: string }>("/api/firmware/jobs", {
-      method: "POST",
-      body: buildForm
-    });
-    buildMessage.value = `${result.message} ${isEnglish.value ? "Job" : "任务"}: ${result.id}`;
-  } catch (error) {
-    buildError.value = true;
-    buildMessage.value = error instanceof Error ? error.message : isEnglish.value ? "Unable to submit job." : "提交任务失败。";
-  } finally {
-    buildSubmitting.value = false;
-  }
-};
-
 const labelForKind = (item: DownloadItem) => text(firmwareKindLabels[item.kind]);
 const labelForChannel = (item: DownloadItem) => text(channelLabels[item.channel]);
 
@@ -85,7 +47,7 @@ useSeoMeta({ title: () => (isEnglish.value ? "Downloads | Great Mountain" : "下
     <PageHero
       :eyebrow="isEnglish ? 'Resources' : '资料中心'"
       :title="isEnglish ? 'Downloads and firmware' : '下载中心与固件管理'"
-      :description="isEnglish ? 'Find product documents, verified firmware and the online Betaflight build entry.' : '按产品、Target、固件类型和版本筛选资料，并预留在线 Betaflight 编译入口。'"
+      :description="isEnglish ? 'Find product documents and firmware, or open the Betaflight ground station.' : '按产品、Target、固件类型和版本筛选资料，或进入 Betaflight 在线地面站。'"
     />
 
     <section class="container content-section">
@@ -156,41 +118,10 @@ useSeoMeta({ title: () => (isEnglish.value ? "Downloads | Great Mountain" : "下
           </div>
 
           <article id="build" class="build-card">
-            <p class="eyebrow">{{ isEnglish ? "Online build (scaffold)" : "在线编译（框架入口）" }}</p>
-            <h2>{{ isEnglish ? "Build a Betaflight firmware" : "按 Target 编译 Betaflight 固件" }}</h2>
-            <p>{{ isEnglish ? "Only administrator-approved repositories, refs and verified option combinations will be accepted. The real F435 build remains disabled until target hardware is verified." : "仅接受管理员配置的仓库、提交和验证过的选项组合。真实 F435 Target 完成硬件确认前，编译任务只作为流程演示。" }}</p>
-            <form class="build-form" @submit.prevent="submitBuild">
-              <label>
-                {{ isEnglish ? "Product" : "产品" }}
-                <select v-model="buildForm.productId"><option value="f435-vmt7">F435 VMT7</option><option value="f435-rgt7">F435 RGT7</option></select>
-              </label>
-              <label>
-                Target
-                <input v-model="buildForm.target" readonly />
-              </label>
-              <label>
-                {{ isEnglish ? "Source ref" : "源码版本" }}
-                <select v-model="buildForm.sourceRef"><option value="stable-4.3.4">4.3.4 stable</option><option value="alpha">Alpha (pending)</option><option value="development">Development (pending)</option></select>
-              </label>
-              <label>
-                {{ isEnglish ? "Verified preset" : "验证配置" }}
-                <select v-model="buildForm.presetId"><option v-for="preset in presets" :key="preset.id" :value="preset.id">{{ text(preset.label) }}</option></select>
-              </label>
-              <div v-if="selectedPreset" class="full option-list">
-                <label v-for="option in selectedPreset.options" :key="option.id">
-                  <span>{{ text(option.label) }}</span>
-                  <select v-model="buildForm.options[option.id]"><option v-for="value in option.values" :key="value" :value="value">{{ value }}</option></select>
-                </label>
-              </div>
-              <label>
-                {{ isEnglish ? "Email (optional)" : "邮箱（可选）" }}
-                <input v-model="buildForm.notificationEmail" type="email" placeholder="name@example.com" />
-              </label>
-              <div class="full">
-                <button class="button-primary" type="submit" :disabled="buildSubmitting">{{ buildSubmitting ? (isEnglish ? "Submitting…" : "提交中…") : (isEnglish ? "Submit build job" : "提交编译任务") }}</button>
-              </div>
-              <p v-if="buildMessage" class="form-message" :class="{ error: buildError }">{{ buildMessage }}</p>
-            </form>
+            <p class="eyebrow">Betaflight</p>
+            <h2>{{ isEnglish ? "Connect, configure and flash" : "连接飞控、配置与刷写" }}</h2>
+            <p>{{ isEnglish ? "Use the Betaflight interface to configure your controller and request firmware. Only approved Targets and options are available. Your compiled firmware is private and kept for 24 hours." : "在 Betaflight 原版界面中配置飞控与申请固件编译。仅开放管理员验证通过的 Target 和选项；生成的固件仅供本人使用，编译完成后保留 24 小时。" }}</p>
+            <div class="download-card-actions"><a class="button-primary" href="/betaflight/">{{ isEnglish ? "Open Betaflight" : "进入 Betaflight" }}</a></div>
           </article>
         </div>
       </div>

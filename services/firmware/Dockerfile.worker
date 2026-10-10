@@ -1,0 +1,13 @@
+FROM betaflight/betaflight-build:arm-2026.6
+ARG BETAFLIGHT_REF=2026.6.2
+ARG BETAFLIGHT_COMMIT=e0b7bb01b17b21351057e9ead2d1ab39dd44fa16
+USER root
+WORKDIR /source
+RUN git init && git remote add origin https://github.com/betaflight/betaflight.git \
+    && git fetch --depth 1 origin "refs/tags/$BETAFLIGHT_REF" && git checkout --detach FETCH_HEAD \
+    && test "$(git rev-parse HEAD)" = "$BETAFLIGHT_COMMIT" \
+    && git submodule update --init --recursive --depth 1 \
+    && make configs \
+    && chown -R 10001:10001 /source
+USER 10001:10001
+WORKDIR /source

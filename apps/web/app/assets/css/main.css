@@ -286,7 +286,7 @@ section.container.content-section { width: min(var(--site-width), calc(100% - 96
 .button-secondary { color: #515a64; border: 1px solid #cdd2d8; background: #fff; }
 .button-primary:hover { background: #e63a1d; transform: translateY(-1px); }
 .button-secondary:hover { color: var(--ink); border-color: var(--ink); }
-.button-primary:disabled { cursor: wait; opacity: .55; }
+.button-primary:disabled, .button-secondary:disabled { cursor: wait; opacity: .55; }
 .build-card { margin-top: 34px; padding: 34px; color: #424b55; background: #fff; }
 .build-card h2 { margin: 0 0 11px; color: var(--ink); font-size: 29px; font-weight: 600; line-height: 1.25; }
 .build-card > p { max-width: 800px; margin: 0; color: #707a85; }
