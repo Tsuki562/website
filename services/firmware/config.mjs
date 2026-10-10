@@ -12,7 +12,7 @@ export function readConfig(env = process.env) {
   if (!Array.isArray(profiles)) throw new Error("Profiles must be an array");
   const seen = new Set();
   for (const profile of profiles) {
-    if (!/^[A-Z0-9_]+$/.test(profile.target) || !/^[a-f0-9]{40}$/.test(profile.commit)
+    if (!/^[A-Z0-9_]+$/.test(profile.target) || !/^[A-Z0-9]+$/.test(profile.mcu) || !/^[a-f0-9]{40}$/.test(profile.commit)
       || !/^[\w.-]+$/.test(profile.release) || !["Stable", "ReleaseCandidate", "Unstable"].includes(profile.releaseType)
       || !/^cshk-betaflight:[\w.-]+$/.test(profile.image) || !profile.hardwareVersion || !profile.toolchain
       || !Array.isArray(profile.allowedOptions) || !Array.isArray(profile.fixedOptions)
@@ -36,6 +36,10 @@ export function readConfig(env = process.env) {
     memory: env.FIRMWARE_WORKER_MEMORY || "2g",
     cpus: env.FIRMWARE_WORKER_CPUS || "1"
   };
+}
+
+export function firmwareFileName(profile) {
+  return `betaflight_${profile.release}_${profile.mcu}_${profile.target}.hex`;
 }
 
 export function validateRequest(body, profiles) {

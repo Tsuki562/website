@@ -2,6 +2,7 @@ import { DatabaseSync } from "node:sqlite";
 import { createHash, randomBytes, timingSafeEqual } from "node:crypto";
 import { mkdirSync } from "node:fs";
 import { join } from "node:path";
+import { firmwareFileName } from "./config.mjs";
 
 const hash = value => createHash("sha256").update(value).digest("hex");
 
@@ -46,10 +47,10 @@ export class JobStore {
   publicJob(job) {
     const request = JSON.parse(job.request);
     return {
-      id: job.id, status: job.status, target: request.profile.target, release: request.profile.release,
+      id: job.id, status: job.status, target: request.profile.target, mcu: request.profile.mcu, release: request.profile.release,
       createdAt: job.created_at, completedAt: job.completed_at, expiresAt: job.expires_at,
       message: job.message, sha256: job.sha256,
-      fileName: job.status === "ready" ? `betaflight_${request.profile.release}_${request.profile.target}.hex` : null
+      fileName: job.status === "ready" ? firmwareFileName(request.profile) : null
     };
   }
 

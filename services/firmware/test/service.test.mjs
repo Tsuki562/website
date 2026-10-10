@@ -25,6 +25,7 @@ test("creates, protects, reads, and cancels anonymous jobs", async () => {
       body: JSON.stringify({ target: profile.target, release: profile.release, options: ["CLOUD_BUILD"] }) });
     assert.equal(createdResponse.status, 202);
     const created = await createdResponse.json();
+    assert.equal(created.file, "betaflight_1.0.0_STM32F7_TESTF7.hex");
     const unauthorized = await fetch(`${base}/jobs/${created.id}?token=wrong`);
     assert.equal(unauthorized.status, 404);
     await unauthorized.arrayBuffer();

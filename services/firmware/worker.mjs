@@ -2,6 +2,7 @@ import { spawn } from "node:child_process";
 import { createHash } from "node:crypto";
 import { mkdir, readFile, rm, stat } from "node:fs/promises";
 import { join } from "node:path";
+import { firmwareFileName } from "./config.mjs";
 
 export function runDocker(args) {
   return new Promise((resolve, reject) => {
@@ -65,8 +66,8 @@ export class BuildQueue {
         new Promise((_, reject) => { timeout = setTimeout(() => reject(new Error("Build timeout")), this.config.buildTimeoutMs); })
       ]);
       if (handle.cancelled) return;
-      // Betaflight names the HEX from its compiled version and target; avoid copying stale or unrelated obj files.
-      const artifactName = `betaflight_${profile.release}_${profile.target}.hex`;
+      // Betaflight names the HEX from version, MCU, and target; avoid stale or unrelated obj files.
+      const artifactName = firmwareFileName(profile);
       const artifact = join(output, artifactName);
       await this.execute(["cp", `${name}:/source/obj/${artifactName}`, output]);
       const size = (await stat(artifact)).size;

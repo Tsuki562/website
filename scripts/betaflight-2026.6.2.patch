@@ -47,7 +47,7 @@ index 7a684fc6..937a06fd 100644
 +                        activeFlasherStep.value = "flash";
 +                        cloudBuild.resumeBuild({
 +                            key: resumeKey,
-+                            file: job.fileName || `betaflight_${job.release}_${job.target}.hex`,
++                            file: job.fileName || `betaflight_${job.release}_${job.mcu}_${job.target}.hex`,
 +                            url: `/api/builds/${resumeKey}/firmware`,
 +                            taskUrl: `/downloads/task/${resumeKey.split(".")[0]}?token=${encodeURIComponent(resumeKey.split(".")[1])}`,
 +                        });

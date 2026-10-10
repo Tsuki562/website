@@ -16,7 +16,7 @@
 
 ```bash
 cd /home/suki/Betaflight/website/services/firmware
-./build-worker.sh
+./build-worker.sh /path/to/betaflight-2026.6.2-src
 node server.mjs
 ```
 
@@ -26,9 +26,9 @@ node server.mjs
 
 默认 1 路并发、50 个等待任务、900 秒编译超时是本地开发参数，生产值尚未确定。排队不设置自动取消期限。运行中任务在服务重启时标记失败，排队任务保留；正常退出会取消正在运行的任务。
 
-Worker 使用官方 `betaflight/betaflight-build:arm-2026.6` 工具链镜像以及固定固件提交。生产部署前须记录并固定工具链镜像 digest，并将其写入 profile 的 `toolchain`。当前镜像尚未在本机 Docker 中验证。
+Worker 使用官方 `betaflight/betaflight-build:arm-2026.6` 工具链镜像以及固定固件提交。当前 Docker Hub 上该 tag 无法拉取；本机已用 Betaflight 官方 `betaflight-build` Dockerfile 和固定固件提交构建该镜像。Worker 镜像从用户本地已校验的 Betaflight 源码检出构建，不在 Docker 内访问 GitHub，并通过 `--network=none` 禁止构建步骤联网；构建时也会在镜像副本中把 Windows Git 的换行格式规范化为 Linux 格式。使用方式：`./build-worker.sh /path/to/betaflight-2026.6.2-src`。生产部署前须记录并固定工具链镜像 digest，并将其写入 profile 的 `toolchain`。
 
-Worker 只从 `obj/` 复制与 profile 的版本和 Target 完全匹配的 `betaflight_<版本>_<Target>.hex`，不扫描或保留整份构建目录；找不到该文件时任务失败并清理临时产物。该命名依据 Betaflight 2026.6.2 固件 [Makefile](https://github.com/betaflight/betaflight/blob/2026.6.2/Makefile) 中的 `TARGET_FULLNAME` / `TARGET_HEX` 规则，真实容器构建仍须另行验证。
+Worker 只从 `obj/` 复制与 profile 的版本、MCU 和 Target 配置完全匹配的 `betaflight_<版本>_<MCU>_<Target>.hex`，不扫描或保留整份构建目录；找不到该文件时任务失败并清理临时产物。命名依据 Betaflight 2026.6.2 固件 [Makefile](https://github.com/betaflight/betaflight/blob/2026.6.2/Makefile) 中的 `TARGET_NAME`、`TARGET_FULLNAME` / `TARGET_HEX` 规则；实际 MATEKF722 编译输出为 `betaflight_2026.6.2_STM32F722_MATEKF722.hex`。
 
 生产环境需用 systemd 或容器编排启动服务，并限制 Docker 权限。Node 服务不接受镜像名、源码地址、Shell 脚本或任意编译参数。Docker Worker 使用无网络、无 Linux capabilities、非 root 用户和资源限制运行。
 

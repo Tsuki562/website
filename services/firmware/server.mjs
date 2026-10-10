@@ -2,7 +2,7 @@ import { createServer } from "node:http";
 import { createReadStream, existsSync } from "node:fs";
 import { pipeline } from "node:stream/promises";
 import { pathToFileURL } from "node:url";
-import { readConfig, validateRequest } from "./config.mjs";
+import { firmwareFileName, readConfig, validateRequest } from "./config.mjs";
 import { JobStore } from "./store.mjs";
 import { BuildQueue } from "./worker.mjs";
 
@@ -76,7 +76,7 @@ export function createFirmwareService(config, execute) {
         const key = `${job.id}.${token}`;
         queue.pump();
         return json(response, 202, { key, id: job.id, accessToken: token,
-          file: `betaflight_${validated.profile.release}_${validated.profile.target}.hex`,
+          file: firmwareFileName(validated.profile),
           url: `/api/builds/${key}/firmware`,
           taskUrl: `/downloads/task/${job.id}?token=${encodeURIComponent(token)}` });
       }

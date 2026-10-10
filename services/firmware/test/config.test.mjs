@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { validateRequest } from "../config.mjs";
+import { firmwareFileName, validateRequest } from "../config.mjs";
 
 const profile = {
   target: "MATEKF722", release: "2026.6.2", commit: "e0b7bb01b17b21351057e9ead2d1ab39dd44fa16",
@@ -20,4 +20,9 @@ test("rejects arbitrary targets, options, commits, and fields", () => {
     { target: profile.target, release: profile.release, options: [], script: "id" },
     { target: profile.target, release: profile.release, options: ["RX_CRSF"] }
   ]) assert.throws(() => validateRequest(body, [profile]));
+});
+
+test("uses the MCU family in the Betaflight firmware artifact filename", () => {
+  assert.equal(firmwareFileName({ ...profile, mcu: "STM32F722" }),
+    "betaflight_2026.6.2_STM32F722_MATEKF722.hex");
 });
