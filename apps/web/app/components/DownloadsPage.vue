@@ -16,9 +16,9 @@ const hardware = ref("");
 const date = ref("");
 
 const catalog = computed(() => data.value?.downloads ?? []);
-const products = computed(() => [...new Set(catalog.value.map((item) => item.productName))]);
-const targets = computed(() => [...new Set(catalog.value.map((item) => item.target))]);
-const hardwareVersions = computed(() => [...new Set(catalog.value.map((item) => item.hardwareVersion))]);
+const products = computed(() => [...new Set(catalog.value.map((item) => item.productName).filter(Boolean))]);
+const targets = computed(() => [...new Set(catalog.value.map((item) => item.target).filter(Boolean))]);
+const hardwareVersions = computed(() => [...new Set(catalog.value.map((item) => item.hardwareVersion).filter(Boolean))]);
 
 const results = computed(() => {
   const normalized = query.value.trim().toLowerCase();
@@ -38,6 +38,12 @@ const results = computed(() => {
 
 const labelForKind = (item: DownloadItem) => text(firmwareKindLabels[item.kind]);
 const labelForChannel = (item: DownloadItem) => text(channelLabels[item.channel]);
+const changelogText = (item: DownloadItem) => text(item.changelog).trim();
+const metadataText = (item: DownloadItem) => [
+  item.releaseDate ? `${isEnglish.value ? "Released" : "发布日期"} ${item.releaseDate}` : "",
+  item.fileSize.trim(),
+  item.sha256 ? `SHA-256: ${item.sha256}` : ""
+].filter(Boolean).join(" · ");
 
 useSeoMeta({ title: () => (isEnglish.value ? "Downloads | Great Mountain" : "下载中心 | 重山航空") });
 </script>
@@ -72,12 +78,14 @@ useSeoMeta({ title: () => (isEnglish.value ? "Downloads | Great Mountain" : "下
               <option value="">{{ isEnglish ? "All types" : "全部类型" }}</option>
               <option value="firmware">{{ isEnglish ? "Firmware" : "固件" }}</option>
               <option value="manual">{{ isEnglish ? "Manual" : "说明书" }}</option>
+              <option value="wiring">{{ isEnglish ? "Wiring diagram" : "接线图" }}</option>
+              <option value="driver">{{ isEnglish ? "Driver & tool" : "驱动与工具" }}</option>
               <option value="vtx-table">{{ isEnglish ? "VTX table" : "图传表" }}</option>
             </select>
           </div>
           <div class="filter-field">
             <label for="download-channel">{{ isEnglish ? "Channel" : "发布通道" }}</label>
-            <select id="download-channel" v-model="channel"><option value="">{{ isEnglish ? "All channels" : "全部版本" }}</option><option value="stable">{{ isEnglish ? "Stable" : "稳定版" }}</option><option value="alpha">Alpha</option><option value="development">{{ isEnglish ? "Development" : "开发版" }}</option></select>
+            <select id="download-channel" v-model="channel"><option value="">{{ isEnglish ? "All channels" : "全部版本" }}</option><option value="stable">{{ isEnglish ? "Stable" : "稳定版" }}</option><option value="alpha">Alpha</option><option value="development">{{ isEnglish ? "Development" : "开发版" }}</option><option value="document">{{ isEnglish ? "Documents" : "资料" }}</option></select>
           </div>
           <div class="filter-field">
             <label for="download-hardware">{{ isEnglish ? "Hardware" : "硬件版本" }}</label>
@@ -94,19 +102,19 @@ useSeoMeta({ title: () => (isEnglish.value ? "Downloads | Great Mountain" : "下
             <article v-for="item in results" :key="item.id" class="download-card">
               <div class="download-card-head">
                 <div>
-                  <p class="eyebrow">{{ item.productName }}</p>
+                  <p v-if="item.productName" class="eyebrow">{{ item.productName }}</p>
                   <h2>{{ item.fileName }}</h2>
                 </div>
                 <span class="tag">{{ labelForChannel(item) }}</span>
               </div>
               <div class="download-card-meta">
                 <span class="tag">{{ labelForKind(item) }}</span>
-                <span class="tag muted">{{ item.version }}</span>
-                <span class="tag muted">{{ item.hardwareVersion }}</span>
-                <span class="tag muted">{{ item.target }}</span>
+                <span v-if="item.version" class="tag muted">{{ item.version }}</span>
+                <span v-if="item.hardwareVersion" class="tag muted">{{ item.hardwareVersion }}</span>
+                <span v-if="item.target" class="tag muted">{{ item.target }}</span>
               </div>
-              <p>{{ text(item.changelog) }}</p>
-              <p>{{ isEnglish ? "Released" : "发布日期" }} {{ item.releaseDate }} · {{ item.fileSize }} · SHA-256: {{ item.sha256 }}</p>
+              <p v-if="changelogText(item)">{{ changelogText(item) }}</p>
+              <p v-if="metadataText(item)">{{ metadataText(item) }}</p>
               <p v-if="item.buildOptions.length">{{ isEnglish ? "Build options" : "构建选项" }}: {{ item.buildOptions.join(" / ") }}</p>
               <div class="download-card-actions">
                 <a v-if="item.href" class="button-primary" :href="item.href" download>{{ isEnglish ? "Download" : "下载" }}</a>

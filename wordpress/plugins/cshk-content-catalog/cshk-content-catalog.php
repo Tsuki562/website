@@ -27,7 +27,7 @@ function cshk_catalog_register_post_types(): void
         'has_archive' => false,
         'rewrite' => false,
         'menu_icon' => 'dashicons-products',
-        'supports' => ['title', 'editor', 'thumbnail', 'page-attributes'],
+        'supports' => ['title', 'editor', 'thumbnail', 'page-attributes', 'custom-fields'],
     ]);
 
     register_post_type('cshk_download', [
@@ -44,7 +44,7 @@ function cshk_catalog_register_post_types(): void
         'has_archive' => false,
         'rewrite' => false,
         'menu_icon' => 'dashicons-download',
-        'supports' => ['title', 'editor', 'page-attributes'],
+        'supports' => ['title', 'editor', 'page-attributes', 'custom-fields'],
     ]);
 }
 add_action('init', 'cshk_catalog_register_post_types');

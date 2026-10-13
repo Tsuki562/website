@@ -1,3 +1,5 @@
 .cache/
 /.env.wordpress
 services/firmware/data/
+# Local copies of legacy media used only for the one-time WordPress import.
+/migration/wordpress/legacy-attachments/

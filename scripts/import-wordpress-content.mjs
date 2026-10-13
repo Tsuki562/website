@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 import { readFile, realpath } from "node:fs/promises";
+import { createHash } from "node:crypto";
+import { fileURLToPath } from "node:url";
 import path from "node:path";
 
 const manifestArgument = process.argv[2];
@@ -9,7 +11,26 @@ if (!manifestArgument) {
 
 const publish = process.argv.includes("--publish");
 const siteUrl = (process.env.WORDPRESS_BASE_URL || "http://127.0.0.1:8080").replace(/\/$/, "");
-const credentials = [process.env.WORDPRESS_USERNAME, process.env.WORDPRESS_APP_PASSWORD];
+const scriptDirectory = path.dirname(fileURLToPath(import.meta.url));
+let localEnvironment = "";
+try {
+  localEnvironment = await readFile(path.resolve(scriptDirectory, "../.env.wordpress"), "utf8");
+} catch (error) {
+  if (error.code !== "ENOENT") throw error;
+}
+function localEnvironmentValue(name) {
+  const line = localEnvironment.split(/\r?\n/).find((entry) => new RegExp(`^\\s*${name}\\s*=`).test(entry));
+  if (!line) return "";
+  let value = line.replace(new RegExp(`^\\s*${name}\\s*=\\s*`), "").trim();
+  if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
+    value = value.slice(1, -1);
+  }
+  return value;
+}
+const credentials = [
+  process.env.WORDPRESS_USERNAME || localEnvironmentValue("WORDPRESS_USERNAME"),
+  (process.env.WORDPRESS_APP_PASSWORD || localEnvironmentValue("WORDPRESS_APP_PASSWORD")).replace(/\s/g, "")
+];
 const site = new URL(siteUrl);
 if (site.protocol !== "http:" || !["127.0.0.1", "localhost", "[::1]"].includes(site.hostname)) {
   throw new Error("For safety, the migration importer only sends credentials to local HTTP WordPress (127.0.0.1/localhost).");
@@ -20,7 +41,7 @@ if (credentials.some((value) => !value)) {
 
 const manifestPath = await realpath(path.resolve(manifestArgument));
 const manifestDirectory = path.dirname(manifestPath);
-const repositoryRoot = await realpath(path.resolve(path.dirname(new URL(import.meta.url).pathname), ".."));
+const repositoryRoot = await realpath(path.resolve(scriptDirectory, ".."));
 const manifest = JSON.parse(await readFile(manifestPath, "utf8"));
 if (!Array.isArray(manifest.products) || !Array.isArray(manifest.downloads)) {
   throw new Error("Manifest must contain products and downloads arrays.");
@@ -85,21 +106,34 @@ function contentType(fileName) {
   })[extension] || "application/octet-stream";
 }
 
-async function uploadMedia(filePath) {
+async function uploadMedia(filePath, record = null) {
   const file = await localFile(filePath);
   if (!file) return 0;
   const name = path.basename(file.resolvedPath);
+  if (record?.sha256) {
+    const actualHash = createHash("sha256").update(file.content).digest("hex");
+    if (actualHash.toLowerCase() !== String(record.sha256).toLowerCase()) {
+      throw new Error(`SHA-256 mismatch for ${name}: expected ${record.sha256}, got ${actualHash}`);
+    }
+  }
+  const exactByteSize = String(record?.fileSize || "").match(/^([\d,]+)\s*B$/i);
+  if (exactByteSize) {
+    const expectedSize = Number(exactByteSize[1].replaceAll(",", ""));
+    if (Number.isSafeInteger(expectedSize) && expectedSize !== file.content.length) {
+      throw new Error(`File size mismatch for ${name}: expected ${expectedSize}, got ${file.content.length}`);
+    }
+  }
   const search = await request(`wp/v2/media?slug=${encodeURIComponent(name.replace(/\.[^.]+$/, ""))}&_fields=id`);
   if (Array.isArray(search) && search.length) return Number(search[0].id);
 
+  // Multipart filenames preserve Unicode; raw Content-Disposition header values
+  // reject Chinese names in Node's Fetch implementation.
+  const form = new FormData();
+  form.set("file", new File([file.content], name, { type: contentType(name) }));
   const response = await fetch(apiUrl("wp/v2/media"), {
     method: "POST",
-    headers: {
-      Authorization: authorization,
-      "Content-Disposition": `attachment; filename="${name.replaceAll('"', "")}"`,
-      "Content-Type": contentType(name)
-    },
-    body: file.content,
+    headers: { Authorization: authorization },
+    body: form,
     signal: AbortSignal.timeout(120000)
   });
   const body = await response.json();
@@ -111,7 +145,7 @@ async function upsertRecord(restBase, record, data, featuredMedia = 0) {
   if (!record || typeof record.id !== "string" || !/^[a-z0-9][a-z0-9-]*$/.test(record.id)) {
     throw new Error(`Each ${restBase} record needs a lowercase slug-style id.`);
   }
-  const found = await request(`wp/v2/${restBase}?slug=${encodeURIComponent(record.id)}&_fields=id`);
+  const found = await request(`wp/v2/${restBase}?slug=${encodeURIComponent(record.id)}&status=any&_fields=id`);
   const existingId = Array.isArray(found) && found.length ? Number(found[0].id) : 0;
   const endpoint = existingId ? `wp/v2/${restBase}/${existingId}` : `wp/v2/${restBase}`;
   const body = {
@@ -138,7 +172,7 @@ for (const record of manifest.products) {
 }
 
 for (const record of manifest.downloads) {
-  const fileMediaId = await uploadMedia(record.filePath);
+  const fileMediaId = await uploadMedia(record.filePath, record);
   const data = {
     product_id: record.productId,
     target: record.target || "",

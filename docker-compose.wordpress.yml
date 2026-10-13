@@ -33,6 +33,7 @@ services:
     volumes:
       - wordpress-content:/var/www/html/wp-content
       - ./wordpress/plugins/cshk-content-catalog/cshk-content-catalog.php:/var/www/html/wp-content/mu-plugins/cshk-content-catalog.php:ro
+      - ./wordpress/php/uploads.ini:/usr/local/etc/php/conf.d/uploads.ini:ro
 
 volumes:
   wordpress-db:
