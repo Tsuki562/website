@@ -3,6 +3,7 @@
   "routes": [
     { "path": "/", "page": "home", "status": "scaffolded" },
     { "path": "/products/", "page": "products", "status": "scaffolded" },
+    { "path": "/antenna/", "page": "antenna-product", "status": "new" },
     { "path": "/service/", "page": "service", "status": "scaffolded" },
     { "path": "/contact/", "page": "contact", "status": "scaffolded" },
     { "path": "/flightcontrol_service/", "page": "flight-control-service", "status": "scaffolded" },
@@ -22,6 +23,7 @@
     { "path": "/en/", "page": "home-en", "status": "scaffolded" },
     { "path": "/en/首页-english/", "page": "home-en-legacy", "status": "scaffolded" },
     { "path": "/en/products/", "page": "products-en", "status": "scaffolded" },
+    { "path": "/en/antenna/", "page": "antenna-product-en", "status": "new" },
     { "path": "/en/products-2/", "page": "products-en-legacy", "status": "scaffolded" },
     { "path": "/en/products-3/", "page": "products-en-legacy-2", "status": "scaffolded" },
     { "path": "/en/service/", "page": "service-en", "status": "scaffolded" },

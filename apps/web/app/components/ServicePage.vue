@@ -9,16 +9,17 @@ const resources = computed(() => [
   {
     title: { zh: "电调", en: "ESC" },
     description: { zh: "电调产品说明与相关技术资料。", en: "ESC product and technical resources." },
-    href: "/esc-45a/"
+    href: localizedPath("/esc-45a/")
   },
   {
     title: { zh: "Beacon 系列图传", en: "Beacon video transmitters" },
     description: { zh: "说明书、接线图、故障排查与图传表。", en: "Manuals, wiring, troubleshooting and VTX tables." },
-    href: "/trans_grid/"
+    href: localizedPath("/trans_grid/")
   },
   {
     title: { zh: "天线", en: "Antennas" },
-    description: { zh: "定制频段与产品支持资料。", en: "Custom frequencies and product support." }
+    description: { zh: "定制频段与产品支持资料。", en: "Custom frequencies and product support." },
+    href: localizedPath("/antenna/")
   },
   {
     title: { zh: "航空发动机", en: "Aero engines" },

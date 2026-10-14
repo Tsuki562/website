@@ -2,7 +2,7 @@
 import type { LocalizedText } from "~~/shared/types/content";
 
 const props = defineProps<{ engine: { name: string; description: LocalizedText; rows: Array<{ label: LocalizedText; value: string }> } }>();
-const { isEnglish, text, localizedPath } = useLocale();
+const { isEnglish, text } = useLocale();
 </script>
 
 <template>
@@ -19,11 +19,13 @@ const { isEnglish, text, localizedPath } = useLocale();
             </template>
           </dl>
         </article>
-        <aside class="detail-card">
+        <aside class="detail-card engine-detail-visual">
           <img class="detail-product-image" src="/images/site/engine.png" :alt="props.engine.name" />
-          <NuxtLink class="button-secondary" style="margin-top: 18px;" :to="localizedPath('/downloads/')">{{ isEnglish ? "Open downloads" : "查看下载资料" }}</NuxtLink>
+          <p>{{ isEnglish ? "Part of the Great Mountain SE aero engine family." : "重山航空 SE 系列航空发动机产品。" }}</p>
         </aside>
       </div>
+
+      <ProductDownloads product-id="se-engine" />
     </section>
   </div>
 </template>

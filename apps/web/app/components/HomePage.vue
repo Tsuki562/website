@@ -1,186 +1,202 @@
 <script setup lang="ts">
 const { isEnglish, localizedPath } = useLocale();
 
+const currentSlide = ref(0);
+const slides = computed(() => [
+  { src: "/images/site/banner-1.jpg", alt: isEnglish.value ? "Flight controller product banner" : "飞控产品展示" },
+  { src: "/images/site/banner-2.jpg", alt: isEnglish.value ? "Aviation products banner" : "航空产品展示" }
+]);
+const activeSlide = computed(() => slides.value[currentSlide.value] ?? slides.value[0]!);
+
 const categories = computed(() => [
   {
-    name: isEnglish.value ? "AT32F435 flight controllers" : "AT32F435 系列飞控",
-    label: isEnglish.value ? "Flight control" : "飞控系统",
-    description: isEnglish.value
-      ? "High-performance domestic flight control built for reliable and expandable platforms."
-      : "面向可靠飞行与灵活扩展打造的高性能国产飞控平台。",
+    name: isEnglish.value ? "AT32F435 flight controllers" : "AT32F435系列飞控",
     image: "/images/site/flight-controller.jpg",
-    href: localizedPath("/flightcontrol_service/"),
-    className: "featured"
+    href: "/flightcontrol_service/"
   },
+  { name: isEnglish.value ? "ESC" : "电调", image: "/images/site/esc.jpg", href: "/esc-45a/" },
   {
-    name: isEnglish.value ? "SE aero engines" : "SE 系列航空发动机",
-    label: isEnglish.value ? "Power system" : "动力系统",
-    description: isEnglish.value
-      ? "A complete engine family from SE45 through SE550."
-      : "覆盖 SE45 至 SE550 的航空发动机产品系列。",
-    image: "/images/site/engine-home-v2.png",
-    href: localizedPath("/g-motor/"),
-    className: "featured engine"
-  },
-  {
-    name: isEnglish.value ? "High-current ESC" : "高性能电调",
-    label: "ESC",
-    description: isEnglish.value ? "32-bit processing and a six-layer 3OZ design." : "32 位处理器与六层 3OZ 大电流设计。",
-    image: "/images/site/esc.jpg",
-    href: localizedPath("/esc-45a/"),
-    className: "compact"
-  },
-  {
-    name: isEnglish.value ? "Beacon video transmitters" : "Beacon 系列图传",
-    label: "VTX",
-    description: isEnglish.value ? "Multi-band, high-output analog video transmission." : "多频段、高功率、高信噪比模拟图传。",
+    name: isEnglish.value ? "Beacon video transmitters" : "Beacon系列图传",
     image: "/images/site/vtx.jpg",
-    href: localizedPath("/trans_grid/"),
-    className: "compact"
+    href: "/trans_grid/"
   },
+  { name: isEnglish.value ? "Antennas" : "天线", image: "/images/site/antenna-home-v2.png", href: "/antenna/" },
   {
-    name: isEnglish.value ? "Custom antennas" : "定制天线",
-    label: isEnglish.value ? "RF system" : "射频系统",
-    description: isEnglish.value ? "Custom frequency bands and structures with low VSWR." : "支持频段与结构定制，兼顾低驻波与一致性。",
-    image: "/images/site/antenna-home-v2.png",
-    href: localizedPath("/products/#antenna"),
-    className: "compact antenna"
+    name: isEnglish.value ? "Aero engines" : "航空发动机",
+    image: "/images/site/engine-home-v2.png",
+    href: "/g-motor/"
   }
 ]);
 
-const supportItems = computed(() => [
+const highlights = computed(() => [
   {
-    number: "01",
-    title: isEnglish.value ? "Firmware center" : "固件下载中心",
-    description: isEnglish.value ? "Filter verified firmware by product, Target and hardware revision." : "按产品、Target 与硬件版本查找经过审核的固件。",
+    name: isEnglish.value ? "AT32F435 flight controller" : "AT32F435系列飞控",
+    points: isEnglish.value ? ["High reliability", "Thoughtful circuit design"] : ["高可靠性 · 高国产化率", "优秀的电路设计"],
+    href: "/flightcontrol_service/",
+    image: "/images/site/flight-controller.jpg"
+  },
+  {
+    name: isEnglish.value ? "ESC" : "电调",
+    points: isEnglish.value ? ["32-bit high-performance processor", "Six-layer 3OZ design"] : ["32位高性能处理器", "6层3OZ · C型铜条设计"],
+    href: "/esc-45a/",
+    image: "/images/site/esc.jpg"
+  },
+  {
+    name: isEnglish.value ? "Beacon video transmitter" : "Beacon系列图传",
+    points: isEnglish.value ? ["Multi-band 2000mW / 2500mW", "High signal-to-noise ratio"] : ["多频段 2000mW / 2500mW", "高信噪比"],
+    href: "/trans_grid/",
+    image: "/images/site/vtx.jpg"
+  },
+  {
+    name: isEnglish.value ? "Custom antennas" : "天线",
+    points: isEnglish.value ? ["Custom frequencies and types", "Low VSWR"] : ["频段与类型可定制", "低驻波比 · 高品质"],
+    href: "/antenna/",
+    image: "/images/site/antenna.png"
+  },
+  {
+    name: isEnglish.value ? "Aero engines" : "航空发动机",
+    points: isEnglish.value ? ["Strong output", "Reliable and fuel efficient"] : ["强劲动力 · 超轻重量", "可靠、稳定、燃油经济"],
+    href: "/g-motor/",
+    image: "/images/site/engine.png"
+  }
+]);
+
+const services = computed(() => [
+  {
+    title: isEnglish.value ? "After-sales service" : "售后服务",
+    description: isEnglish.value ? "Find product support and service information." : "查找产品支持与服务信息。",
+    href: localizedPath("/service/")
+  },
+  {
+    title: isEnglish.value ? "Manuals and downloads" : "使用说明书与下载",
+    description: isEnglish.value ? "Browse manuals, wiring diagrams and public files." : "浏览说明书、接线图与公开资料。",
     href: localizedPath("/downloads/")
   },
   {
-    number: "02",
-    title: isEnglish.value ? "Online Betaflight build" : "在线编译 Betaflight",
-    description: isEnglish.value ? "Choose an approved Target, source version and supported build options." : "选择已验证的 Target、源码版本与可用构建选项。",
+    title: isEnglish.value ? "Open-source information" : "开源资料",
+    description: isEnglish.value ? "Explore the Betaflight firmware ecosystem." : "了解 Betaflight 固件生态与相关资料。",
     href: `${localizedPath("/downloads/")}#build`
-  },
-  {
-    number: "03",
-    title: isEnglish.value ? "Manuals and support" : "说明书与技术支持",
-    description: isEnglish.value ? "Find wiring documents, product manuals and after-sales assistance." : "集中获取接线资料、产品说明书与售后支持。",
-    href: localizedPath("/service/")
   }
 ]);
 
+function showSlide(index: number) {
+  currentSlide.value = (index + slides.value.length) % slides.value.length;
+}
+
 useSeoMeta({
   title: () => (isEnglish.value ? "Great Mountain Aviation" : "重山航空"),
-  description: () =>
-    isEnglish.value
-      ? "Great Mountain flight control, video transmission and aero engine products."
-      : "重山航空飞控、图传、天线和航空发动机产品与服务。"
+  description: () => isEnglish.value
+    ? "Great Mountain flight controllers, video transmitters, antennas and aero engines."
+    : "重山航空飞控、图传、天线和航空发动机产品与服务。"
 });
 </script>
 
 <template>
-  <div class="home-page">
-    <section class="home-hero">
-      <div class="home-hero-media" aria-hidden="true">
-        <img src="/images/site/banner-1.jpg" alt="" />
+  <div class="reference-home">
+    <section class="reference-slider" :aria-label="isEnglish ? 'Featured products' : '产品展示'">
+      <div class="reference-slides" aria-live="polite">
+        <Transition name="reference-slide">
+          <img
+            :key="activeSlide.src"
+            class="reference-slide-image"
+            :src="activeSlide.src"
+            :alt="activeSlide.alt"
+          />
+        </Transition>
       </div>
-      <div class="home-hero-grid" aria-hidden="true"></div>
-      <div class="container home-hero-inner">
-        <div class="home-hero-copy">
-          <p class="hero-kicker">GREAT MOUNTAIN · FLIGHT SYSTEMS</p>
-          <h1 v-if="isEnglish">Engineered for<br /><em>reliable flight.</em></h1>
-          <h1 v-else>为可靠飞行<br /><em>重新定义控制核心</em></h1>
-          <p class="hero-lead">
-            {{ isEnglish
-              ? "Domestic high-performance flight controllers, video transmission and power systems — designed as one dependable platform."
-              : "从高性能国产飞控，到图传与动力系统，以完整可靠的硬件平台支撑每一次飞行。" }}
-          </p>
-          <div class="hero-actions">
-            <NuxtLink class="button-primary button-large" :to="localizedPath('/products/')">
-              {{ isEnglish ? "Explore products" : "查看产品" }}
-              <span aria-hidden="true">↗</span>
-            </NuxtLink>
-            <NuxtLink class="button-ghost button-large" :to="localizedPath('/downloads/')">
-              {{ isEnglish ? "Firmware & downloads" : "固件与下载" }}
-            </NuxtLink>
-          </div>
-        </div>
+      <button
+        class="reference-slider-arrow previous"
+        type="button"
+        :aria-label="isEnglish ? 'Previous banner' : '上一张展示图'"
+        @click="showSlide(currentSlide - 1)"
+      >
+        <span aria-hidden="true">←</span>
+      </button>
+      <button
+        class="reference-slider-arrow next"
+        type="button"
+        :aria-label="isEnglish ? 'Next banner' : '下一张展示图'"
+        @click="showSlide(currentSlide + 1)"
+      >
+        <span aria-hidden="true">→</span>
+      </button>
+      <div class="reference-slider-dots" role="group" :aria-label="isEnglish ? 'Choose a banner' : '选择展示图'">
+        <button
+          v-for="(slide, index) in slides"
+          :key="slide.src"
+          type="button"
+          :aria-label="isEnglish ? `Show banner ${index + 1}` : `显示第 ${index + 1} 张展示图`"
+          :aria-pressed="currentSlide === index"
+          :class="{ active: currentSlide === index }"
+          @click="showSlide(index)"
+        />
       </div>
-      <div class="home-hero-index" aria-hidden="true"><strong>01</strong><span>/ 02</span></div>
     </section>
 
-    <section class="home-proof" aria-label="核心能力">
-      <div class="container home-proof-grid">
-        <div><strong>AT32F435</strong><span>{{ isEnglish ? "High-performance MCU" : "高性能国产主控" }}</span></div>
-        <div><strong>Betaflight</strong><span>{{ isEnglish ? "Firmware ecosystem" : "成熟固件生态" }}</span></div>
-        <div><strong>RGT7 / VMT7</strong><span>{{ isEnglish ? "Flight-control platforms" : "飞控硬件平台" }}</span></div>
-        <div><strong>SE45—SE550</strong><span>{{ isEnglish ? "Aero engine family" : "航空发动机系列" }}</span></div>
+    <nav class="reference-category-strip" :aria-label="isEnglish ? 'Product categories' : '产品分类'">
+      <div class="reference-category-track">
+        <NuxtLink
+          v-for="category in categories"
+          :key="category.name"
+          class="reference-category"
+          :to="localizedPath(category.href)"
+        >
+          <span class="reference-category-image"><img :src="category.image" alt="" loading="lazy" /></span>
+          <strong>{{ category.name }}</strong>
+        </NuxtLink>
       </div>
-    </section>
+    </nav>
 
-    <section class="home-products">
+    <section class="reference-product-section">
       <div class="container">
-        <div class="home-section-heading">
-          <div>
-            <p class="section-index">01 — {{ isEnglish ? "PRODUCT SYSTEM" : "产品体系" }}</p>
-            <h2>{{ isEnglish ? "Built as a complete system" : "不止单一硬件，构建完整飞行系统" }}</h2>
-          </div>
-          <p>{{ isEnglish ? "Flight control, RF and power products developed around real operational needs." : "围绕真实飞行需求，覆盖控制、射频与动力的完整产品组合。" }}</p>
+        <div class="reference-section-heading">
+          <p class="reference-overline">{{ isEnglish ? "GREAT MOUNTAIN · FLIGHT SYSTEMS" : "重山航空 · 飞行系统" }}</p>
+          <h1>{{ isEnglish ? "Products and support for reliable flight" : "专注飞行控制与航空动力" }}</h1>
         </div>
-
-        <div class="home-product-grid">
+        <div class="reference-product-grid">
           <NuxtLink
-            v-for="(category, index) in categories"
-            :key="category.name"
-            :to="category.href"
-            class="home-product-card"
-            :class="category.className"
+            v-for="(item, index) in highlights"
+            :key="item.name"
+            class="reference-product-card"
+            :to="localizedPath(item.href)"
           >
-            <img :src="category.image" :alt="category.name" />
-            <span class="product-card-shade"></span>
-            <span class="product-card-number">0{{ index + 1 }}</span>
-            <span class="product-card-copy">
-              <small>{{ category.label }}</small>
-              <strong>{{ category.name }}</strong>
-              <span>{{ category.description }}</span>
-            </span>
-            <span class="product-card-arrow" aria-hidden="true">↗</span>
-          </NuxtLink>
-        </div>
-      </div>
-    </section>
-
-    <section id="services" class="home-support">
-      <div class="container">
-        <div class="home-section-heading light">
-          <div>
-            <p class="section-index">02 — {{ isEnglish ? "SUPPORT" : "服务支持" }}</p>
-            <h2>{{ isEnglish ? "From documentation to firmware" : "从资料查询到固件构建" }}</h2>
-          </div>
-          <p>{{ isEnglish ? "A clearer path to verified files, build jobs and technical assistance." : "让经过审核的文件、编译任务和技术支持更容易被找到。" }}</p>
-        </div>
-        <div class="home-support-grid">
-          <NuxtLink v-for="item in supportItems" :key="item.number" :to="item.href" class="support-item">
-            <span class="support-number">{{ item.number }}</span>
-            <div>
-              <h3>{{ item.title }}</h3>
-              <p>{{ item.description }}</p>
+            <div class="reference-product-image"><img :src="item.image" alt="" loading="lazy" /></div>
+            <div class="reference-product-copy">
+              <span class="reference-product-number">0{{ index + 1 }}</span>
+              <h2>{{ item.name }}</h2>
+              <p v-for="point in item.points" :key="point">{{ point }}</p>
+              <span class="reference-more">{{ isEnglish ? "Explore" : "了解更多" }} <span aria-hidden="true">→</span></span>
             </div>
-            <span class="support-arrow" aria-hidden="true">→</span>
           </NuxtLink>
         </div>
       </div>
     </section>
 
-    <section id="contact" class="home-contact">
-      <div class="container home-contact-inner">
-        <div>
-          <p class="section-index">03 — {{ isEnglish ? "CONTACT" : "联系我们" }}</p>
-          <h2>{{ isEnglish ? "Have a product or integration question?" : "有产品选型或系统集成需求？" }}</h2>
+    <section class="reference-services" id="whyus">
+      <div class="container">
+        <div class="reference-section-heading">
+          <p class="reference-overline">{{ isEnglish ? "SERVICE · SUPPORT · DOWNLOAD" : "服务 · 支持 · 下载" }}</p>
+          <h2>{{ isEnglish ? "Services and support" : "服务支持与资料下载" }}</h2>
         </div>
-        <NuxtLink class="contact-link" :to="localizedPath('/contact/')">
-          <span>{{ isEnglish ? "Talk to us" : "与我们联系" }}</span>
-          <span aria-hidden="true">↗</span>
+        <div class="reference-service-grid">
+          <NuxtLink v-for="(item, index) in services" :key="item.title" :to="item.href" class="reference-service-card">
+            <span class="reference-service-number">0{{ index + 1 }}</span>
+            <h3>{{ item.title }}</h3>
+            <p>{{ item.description }}</p>
+            <span class="reference-more">{{ isEnglish ? "View information" : "查看资料" }} <span aria-hidden="true">→</span></span>
+          </NuxtLink>
+        </div>
+      </div>
+    </section>
+
+    <section class="reference-contact">
+      <div class="container reference-contact-inner">
+        <div>
+          <p class="reference-overline">{{ isEnglish ? "CONTACT US" : "联系我们" }}</p>
+          <h2>{{ isEnglish ? "Contact us for more information" : "联系我们，获取更多信息" }}</h2>
+        </div>
+        <NuxtLink class="reference-contact-link" :to="localizedPath('/contact/')">
+          {{ isEnglish ? "Contact details" : "获取联系方式" }} <span aria-hidden="true">↗</span>
         </NuxtLink>
       </div>
     </section>

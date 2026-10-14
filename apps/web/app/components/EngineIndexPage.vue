@@ -26,6 +26,7 @@ const engines = [
           <NuxtLink class="text-link" :to="localizedPath(engine.href)">{{ isEnglish ? "View specifications" : "查看技术参数" }} →</NuxtLink>
         </article>
       </div>
+      <ProductDownloads product-id="se-engine" />
     </section>
   </div>
 </template>

@@ -12,11 +12,12 @@ const imageByProduct: Record<string, string> = {
   "se-engine": "/images/site/engine.png"
 };
 const image = computed(() => props.product.image || imageByProduct[props.product.id] || "/images/site/flight-controller.jpg");
+const detailPath = computed(() => localizedPath(props.product.id === "antenna" ? "/antenna/" : props.product.href));
 </script>
 
 <template>
   <article class="product-card" :id="product.id">
-    <NuxtLink :to="localizedPath(product.href)" class="product-image-link">
+    <NuxtLink :to="detailPath" class="product-image-link">
       <img :src="image" :alt="product.name" />
     </NuxtLink>
     <div class="product-card-body">
@@ -26,7 +27,7 @@ const image = computed(() => props.product.image || imageByProduct[props.product
       <ul class="feature-list">
         <li v-for="highlight in product.highlights" :key="highlight.zh">{{ text(highlight) }}</li>
       </ul>
-      <NuxtLink class="text-link" :to="localizedPath(product.href)">{{ $route.path.startsWith('/en') ? "View details" : "查看详情" }} →</NuxtLink>
+      <NuxtLink class="text-link" :to="detailPath">{{ $route.path.startsWith('/en') ? "View product details" : "查看产品详情" }} →</NuxtLink>
     </div>
   </article>
 </template>
