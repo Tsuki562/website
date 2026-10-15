@@ -56,10 +56,11 @@ export class BuildQueue {
       await mkdir(output, { recursive: true });
       if (handle.cancelled) return;
       const flags = [...profile.fixedOptions, ...options].join(" ");
+      const selector = profile.buildMode === "config" ? `CONFIG=${profile.target}` : `TARGET=${profile.target}`;
       await this.execute(["create", "--name", name, "--network=none", "--cap-drop=ALL",
         "--security-opt=no-new-privileges", `--memory=${this.config.memory}`, `--cpus=${this.config.cpus}`,
         "--pids-limit=256", "--label=cshk.firmware=true", profile.image,
-        "make", profile.target, `OPTIONS=${flags}`, "-j1"]);
+        "make", selector, `OPTIONS=${flags}`, "-j1"]);
       if (handle.cancelled) return;
       await Promise.race([
         this.execute(["start", "-a", name]),

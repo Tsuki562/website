@@ -1,4 +1,5 @@
-FROM betaflight/betaflight-build:arm-2026.6
+ARG TOOLCHAIN_IMAGE=betaflight/betaflight-build:arm-2026.6
+FROM ${TOOLCHAIN_IMAGE}
 ARG BETAFLIGHT_COMMIT=e0b7bb01b17b21351057e9ead2d1ab39dd44fa16
 USER root
 WORKDIR /source

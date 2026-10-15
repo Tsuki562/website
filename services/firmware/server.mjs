@@ -44,14 +44,14 @@ export function createFirmwareService(config, execute) {
         }])).values()];
         return json(response, 200, targets);
       }
-      const targetMatch = path.match(/^\/api\/targets\/([A-Z0-9_]+)$/);
+      const targetMatch = path.match(/^\/api\/targets\/([A-Z0-9_-]+)$/);
       if (targetMatch && method === "GET") {
         const profiles = config.profiles.filter(profile => profile.target === targetMatch[1]);
         const releases = profiles.map(profile => ({ release: profile.release, type: profile.releaseType,
           label: profile.releaseType === "Stable" ? "Stable" : "测试版 / May be unstable" }));
         return json(response, 200, { target: targetMatch[1], releases });
       }
-      const detailMatch = path.match(/^\/api\/builds\/([\w.-]+)\/([A-Z0-9_]+)$/);
+      const detailMatch = path.match(/^\/api\/builds\/([\w.-]+)\/([A-Z0-9_-]+)$/);
       if (detailMatch && method === "GET") {
         const profile = config.profiles.find(item => item.release === detailMatch[1] && item.target === detailMatch[2]);
         if (!profile) throw failure(404, "Build profile not found");

@@ -12,9 +12,11 @@ export function readConfig(env = process.env) {
   if (!Array.isArray(profiles)) throw new Error("Profiles must be an array");
   const seen = new Set();
   for (const profile of profiles) {
-    if (!/^[A-Z0-9_]+$/.test(profile.target) || !/^[A-Z0-9]+$/.test(profile.mcu) || !/^[a-f0-9]{40}$/.test(profile.commit)
+    if (!/^[A-Z0-9][A-Z0-9_-]*$/.test(profile.target) || !/^[A-Z0-9]+$/.test(profile.mcu) || !/^[a-f0-9]{40}$/.test(profile.commit)
       || !/^[\w.-]+$/.test(profile.release) || !["Stable", "ReleaseCandidate", "Unstable"].includes(profile.releaseType)
       || !/^cshk-betaflight:[\w.-]+$/.test(profile.image) || !profile.hardwareVersion || !profile.toolchain
+      || !["config", "target"].includes(profile.buildMode) || !["hex", "bin", "uf2", "exe"].includes(profile.outputExtension)
+      || !["arm", "apm32f4", "esp_idf", "none", "pico_sdk", "stm32c5", "stm32h5", "stm32n6", "x32m7"].includes(profile.sdk)
       || !Array.isArray(profile.allowedOptions) || !Array.isArray(profile.fixedOptions)
       || !Array.isArray(profile.allowedOptionSets)
       || profile.allowedOptionSets.some(set => !Array.isArray(set) || set.some(option => !profile.allowedOptions.includes(option)))
@@ -39,7 +41,9 @@ export function readConfig(env = process.env) {
 }
 
 export function firmwareFileName(profile) {
-  return `betaflight_${profile.release}_${profile.mcu}_${profile.target}.hex`;
+  const targetName = profile.buildMode === "config" ? `${profile.mcu}_${profile.target}` : profile.target;
+  const extension = profile.outputExtension === "exe" ? "" : `.${profile.outputExtension}`;
+  return `betaflight_${profile.release}_${targetName}${extension}`;
 }
 
 export function validateRequest(body, profiles) {

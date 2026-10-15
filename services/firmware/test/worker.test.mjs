@@ -20,7 +20,8 @@ test("worker requests the profile-specific HEX and records 24-hour retention", a
   const queue = new BuildQueue(store, { dataDir: directory, concurrency: 1, buildTimeoutMs: 1000,
     memory: "128m", cpus: "0.1" }, execute);
   try {
-    const { job } = store.create({ profile: { target: "TESTF7", mcu: "STM32F7", release: "1.0.0", image: "cshk-betaflight:test", fixedOptions: [] }, options: [] });
+    const { job } = store.create({ profile: { target: "TESTF7", mcu: "STM32F7", release: "1.0.0", buildMode: "config",
+      outputExtension: "hex", image: "cshk-betaflight:test", fixedOptions: [] }, options: [] });
     queue.pump();
     await queue.running.get(job.id).promise;
     const completed = store.get(job.id);
@@ -33,9 +34,39 @@ test("worker requests the profile-specific HEX and records 24-hour retention", a
     const create = calls.find(args => args[0] === "create");
     assert.ok(create.includes("--network=none"));
     assert.ok(create.includes("--cap-drop=ALL"));
+    assert.ok(create.includes("CONFIG=TESTF7"));
     assert.ok(calls.some(args => args[0] === "cp"
       && args[1] === `cshk-build-${job.id}:/source/obj/betaflight_1.0.0_STM32F7_TESTF7.hex`));
     assert.deepEqual(calls.at(-1), ["rm", "-f", `cshk-build-${job.id}`]);
+  } finally {
+    await queue.stop();
+    store.close();
+    await rm(directory, { recursive: true, force: true });
+  }
+});
+
+test("worker builds a platform Target and retrieves its UF2 artifact", async () => {
+  const directory = await mkdtemp(join(tmpdir(), "cshk-worker-test-"));
+  const store = new JobStore(directory);
+  const calls = [];
+  const execute = async args => {
+    calls.push(args);
+    if (args[0] === "cp") await writeFile(join(args[2], args[1].split("/").at(-1)), "UF2 test artifact");
+  };
+  const queue = new BuildQueue(store, { dataDir: directory, concurrency: 1, buildTimeoutMs: 1000,
+    memory: "128m", cpus: "0.1" }, execute);
+  try {
+    const { job } = store.create({ profile: { target: "RP2350A", mcu: "RP2350A", release: "1.0.0", buildMode: "target",
+      outputExtension: "uf2", image: "cshk-betaflight:test", fixedOptions: [] }, options: [] });
+    queue.pump();
+    await queue.running.get(job.id).promise;
+    assert.equal(store.get(job.id).status, "ready");
+    assert.equal(store.publicJob(store.get(job.id)).fileName, "betaflight_1.0.0_RP2350A.uf2");
+    const create = calls.find(args => args[0] === "create");
+    assert.ok(create.includes("TARGET=RP2350A"));
+    assert.ok(!create.includes("CONFIG=RP2350A"));
+    assert.ok(calls.some(args => args[0] === "cp"
+      && args[1] === `cshk-build-${job.id}:/source/obj/betaflight_1.0.0_RP2350A.uf2`));
   } finally {
     await queue.stop();
     store.close();
@@ -52,7 +83,8 @@ test("worker fails and removes artifacts if the expected HEX is missing", async 
   const queue = new BuildQueue(store, { dataDir: directory, concurrency: 1, buildTimeoutMs: 1000,
     memory: "128m", cpus: "0.1" }, execute);
   try {
-    const { job } = store.create({ profile: { target: "TESTF7", mcu: "STM32F7", release: "1.0.0", image: "cshk-betaflight:test", fixedOptions: [] }, options: [] });
+    const { job } = store.create({ profile: { target: "TESTF7", mcu: "STM32F7", release: "1.0.0", buildMode: "config",
+      outputExtension: "hex", image: "cshk-betaflight:test", fixedOptions: [] }, options: [] });
     queue.pump();
     await queue.running.get(job.id).promise;
     assert.equal(store.get(job.id).status, "failed");
@@ -75,7 +107,8 @@ test("worker times out, removes its container and releases its slot", async () =
   const queue = new BuildQueue(store, { dataDir: directory, concurrency: 1, buildTimeoutMs: 10,
     memory: "128m", cpus: "0.1" }, execute);
   try {
-    const { job } = store.create({ profile: { target: "TESTF7", mcu: "STM32F7", release: "1.0.0", image: "cshk-betaflight:test", fixedOptions: [] }, options: [] });
+    const { job } = store.create({ profile: { target: "TESTF7", mcu: "STM32F7", release: "1.0.0", buildMode: "config",
+      outputExtension: "hex", image: "cshk-betaflight:test", fixedOptions: [] }, options: [] });
     queue.pump();
     await queue.running.get(job.id).promise;
     assert.equal(store.get(job.id).status, "failed");
@@ -102,7 +135,8 @@ test("cancelling a running build removes its container without marking it failed
   const queue = new BuildQueue(store, { dataDir: directory, concurrency: 1, buildTimeoutMs: 1000,
     memory: "128m", cpus: "0.1" }, execute);
   try {
-    const { job } = store.create({ profile: { target: "TESTF7", mcu: "STM32F7", release: "1.0.0", image: "cshk-betaflight:test", fixedOptions: [] }, options: [] });
+    const { job } = store.create({ profile: { target: "TESTF7", mcu: "STM32F7", release: "1.0.0", buildMode: "config",
+      outputExtension: "hex", image: "cshk-betaflight:test", fixedOptions: [] }, options: [] });
     queue.pump();
     const handle = queue.running.get(job.id);
     await new Promise(resolve => setImmediate(resolve));

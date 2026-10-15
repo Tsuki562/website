@@ -7,9 +7,10 @@ import { createFirmwareService } from "../server.mjs";
 
 test("creates, protects, reads, and cancels anonymous jobs", async () => {
   const dataDir = await mkdtemp(join(tmpdir(), "cshk-firmware-test-"));
-  const profile = { enabled: true, target: "TESTF7", manufacturer: "TEST", hardwareVersion: "1",
-    mcu: "STM32F7", release: "1.0.0", releaseType: "Stable", commit: "a".repeat(40), image: "cshk-betaflight:test",
-    toolchain: "test", allowedOptions: ["CLOUD_BUILD"], allowedOptionSets: [["CLOUD_BUILD"]], fixedOptions: [], optionGroups: {} };
+  const profile = { enabled: true, target: "LUXHDAIO-G4", manufacturer: "TEST", hardwareVersion: "1",
+    mcu: "STM32G474", release: "1.0.0", releaseType: "Stable", commit: "a".repeat(40), image: "cshk-betaflight:test",
+    toolchain: "test", sdk: "arm", buildMode: "config", outputExtension: "hex",
+    allowedOptions: ["CLOUD_BUILD"], allowedOptionSets: [["CLOUD_BUILD"]], fixedOptions: [], optionGroups: {} };
   let releaseBuild;
   const execute = async args => {
     if (args[0] === "start") await new Promise(resolve => { releaseBuild = resolve; });
@@ -21,11 +22,20 @@ test("creates, protects, reads, and cancels anonymous jobs", async () => {
   await new Promise(resolve => service.server.listen(0, "127.0.0.1", resolve));
   const base = `http://127.0.0.1:${service.server.address().port}`;
   try {
+    const targetsResponse = await fetch(`${base}/api/targets`);
+    assert.equal(targetsResponse.status, 200);
+    assert.equal((await targetsResponse.json())[0].target, profile.target);
+    const targetResponse = await fetch(`${base}/api/targets/${profile.target}`);
+    assert.equal(targetResponse.status, 200);
+    assert.equal((await targetResponse.json()).target, profile.target);
+    const detailResponse = await fetch(`${base}/api/builds/${profile.release}/${profile.target}`);
+    assert.equal(detailResponse.status, 200);
+    assert.equal((await detailResponse.json()).target, profile.target);
     const createdResponse = await fetch(`${base}/api/builds`, { method: "POST", headers: { "content-type": "application/json" },
       body: JSON.stringify({ target: profile.target, release: profile.release, options: ["CLOUD_BUILD"] }) });
     assert.equal(createdResponse.status, 202);
     const created = await createdResponse.json();
-    assert.equal(created.file, "betaflight_1.0.0_STM32F7_TESTF7.hex");
+    assert.equal(created.file, "betaflight_1.0.0_STM32G474_LUXHDAIO-G4.hex");
     const unauthorized = await fetch(`${base}/jobs/${created.id}?token=wrong`);
     assert.equal(unauthorized.status, 404);
     await unauthorized.arrayBuffer();
