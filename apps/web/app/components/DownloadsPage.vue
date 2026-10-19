@@ -117,7 +117,7 @@ useSeoMeta({ title: () => (isEnglish.value ? "Downloads | Great Mountain" : "下
               <p v-if="metadataText(item)">{{ metadataText(item) }}</p>
               <p v-if="item.buildOptions.length">{{ isEnglish ? "Build options" : "构建选项" }}: {{ item.buildOptions.join(" / ") }}</p>
               <div class="download-card-actions">
-                <a v-if="item.href" class="button-primary" :href="item.href" download>{{ isEnglish ? "Download" : "下载" }}</a>
+                <a v-if="item.href" class="button-primary" :href="`/api/content/downloads/${encodeURIComponent(item.id)}/download`" :download="item.fileName">{{ isEnglish ? "Download" : "下载" }}</a>
                 <span v-else class="button-secondary">{{ isEnglish ? "File migration pending" : "文件迁移待完成" }}</span>
                 <span class="muted-text">{{ isEnglish ? "Downloads" : "下载次数" }}: {{ item.downloadCount }}</span>
               </div>

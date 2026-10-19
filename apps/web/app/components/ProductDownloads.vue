@@ -39,7 +39,7 @@ const centerPath = computed(() => localizedPath("/downloads/"));
           </p>
           <p v-if="item.fileSize">{{ isEnglish ? "File size" : "文件大小" }} · {{ item.fileSize }}</p>
         </div>
-        <a v-if="item.href" class="button-primary" :href="item.href" :download="item.fileName">
+        <a v-if="item.href" class="button-primary" :href="`/api/content/downloads/${encodeURIComponent(item.id)}/download`" :download="item.fileName">
           {{ isEnglish ? "Download" : "直接下载" }} <span aria-hidden="true">↓</span>
         </a>
         <NuxtLink v-else class="button-secondary" :to="centerPath">{{ isEnglish ? "View resource" : "查看资料" }}</NuxtLink>

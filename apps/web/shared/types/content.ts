@@ -36,6 +36,7 @@ export interface DownloadItem {
   changelog: LocalizedText;
   buildOptions: string[];
   href?: string;
+  downloadHref?: string;
 }
 
 export interface BuildPreset {

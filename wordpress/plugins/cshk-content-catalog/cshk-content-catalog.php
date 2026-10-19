@@ -243,6 +243,7 @@ function cshk_catalog_download_record(WP_Post $post): array
         'changelog' => cshk_catalog_localized_value($data['changelog'] ?? null),
         'buildOptions' => isset($data['build_options']) && is_array($data['build_options']) ? array_values($data['build_options']) : [],
         'href' => $media_id ? wp_get_attachment_url($media_id) : null,
+        'downloadHref' => $media_id ? (wp_get_original_image_url($media_id) ?: wp_get_attachment_url($media_id)) : null,
     ];
 }
 
